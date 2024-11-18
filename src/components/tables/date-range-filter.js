@@ -38,7 +38,7 @@ const DateRangeFilter = ({ filter, setFilter }) => {
             borderColor: "#787877", // Custom border color
           },
           "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#3473e0", // Border color on hover
+            borderColor: "#787877", // Border color on hover
           },
         }}
       />
@@ -69,7 +69,7 @@ const DateRangeFilter = ({ filter, setFilter }) => {
             borderColor: "#787877", // Custom border color
           },
           "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#3473e0 ", // Border color on hover
+            borderColor: "#787877 ", // Border color on hover
           },
         }}
       />

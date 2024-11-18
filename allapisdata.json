@@ -302,7 +302,7 @@
       "age": "27",
       "fatherName": "George",
       "motherName": "Megan",
-      "education": "B.A.A.A",
+      "education": "B.A",
       "husbandName": null,
       "city": "Phoenix ",
       "profession": "Consultant",
@@ -1312,7 +1312,7 @@
     },
     {
       "id": "101",
-      "member": "Sailu",
+      "member": "Sailu Garapati",
       "age": "35",
       "fatherName": "Ramachandrarao",
       "motherName": "Nirmala",
@@ -1321,7 +1321,8 @@
       "city": "Vinukonda",
       "profession": "Teacher",
       "description": "My Third Sister",
-      "isEnabled": true
+      "isEnabled": true,
+      "status": "Enabled"
     },
     {
       "id": "102",
@@ -2582,6 +2583,30 @@
       "profession": "Business",
       "description": "Business Man",
       "status": "Enabled"
+    },
+    {
+      "id": "202",
+      "member": "Abhishek Dasari",
+      "age": "40",
+      "education": "M.tech",
+      "fatherName": "Joseph",
+      "motherName": "Abhigeil",
+      "city": "New york",
+      "profession": "Professor",
+      "description": "Highly Qualified Profession",
+      "status": "Enabled"
+    },
+    {
+      "id": "203",
+      "member": "Mahesh Gumma",
+      "age": "21",
+      "education": "B.tech",
+      "fatherName": "Anjaneyulu",
+      "motherName": "Veeralakshmi",
+      "city": "Enugupalem",
+      "profession": "Study",
+      "description": "Nice guy",
+      "status": "Disabled"
     }
   ]
 }
