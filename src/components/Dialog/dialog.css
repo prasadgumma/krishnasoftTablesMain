@@ -1,0 +1,6 @@
+@media (min-width: 320px) and (max-width: 990px) {
+    .mainDialogueContainer .MuiDialog-paper {
+      width: 100% !important;
+    }
+  }
+  
