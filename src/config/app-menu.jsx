@@ -9,8 +9,7 @@ const Menu = [
       { path: "/table/plugins", title: "Table Plugins" },
       { path: "/table/plugins1", title: "Table Plugins1" },
       { path: "/table/foldersview", title: "Folders View" },
-      // { path: "/table/add-member", title: "Add Menu" }
-
+      { path: "/table/dummyTable", title: "Dummy Table" }
 
     ],
   },

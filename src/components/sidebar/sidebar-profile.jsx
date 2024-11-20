@@ -6,12 +6,12 @@ import { slideToggle } from './../../composables/slideToggle.js';
 function SidebarProfile() {
 	function handleProfileExpand(e) {
 		e.preventDefault();
-		
+
 		var targetSidebar = document.querySelector('.app-sidebar:not(.app-sidebar-end)');
 		var targetMenu = e.target.closest('.menu-profile');
 		var targetProfile = document.querySelector('#appSidebarProfileMenu');
 		var expandTime = (targetSidebar && targetSidebar.getAttribute('data-disable-slide-animation')) ? 0 : 250;
-	
+
 		if (targetProfile) {
 			if (targetProfile.style.display === 'block') {
 				targetMenu.classList.remove('active');
@@ -22,10 +22,10 @@ function SidebarProfile() {
 			targetProfile.classList.toggle('expand');
 		}
 	}
-  
+
 	return (
 		<AppSettings.Consumer>
-			{({appSidebarMinify}) => (
+			{({ appSidebarMinify }) => (
 				<div className="menu">
 					<div className="menu-profile">
 						<Link to="/" onClick={handleProfileExpand} className="menu-profile-link">
@@ -36,7 +36,7 @@ function SidebarProfile() {
 							<div className="menu-profile-info">
 								<div className="d-flex align-items-center">
 									<div className="flex-grow-1">
-										Sean Ngu
+										Prasad Gumma
 									</div>
 									<div className="menu-caret ms-auto"></div>
 								</div>

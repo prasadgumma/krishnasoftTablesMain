@@ -3,7 +3,7 @@
     {
       "id": "1",
       "createdDate": "01-01-2020",
-      "member": "Linda",
+      "member": "Linda Christina",
       "age": "32",
       "fatherName": "Paul",
       "motherName": "Ann",
@@ -11,7 +11,7 @@
       "husbandName": "Mark",
       "city": "Chicago",
       "profession": "Scientist",
-      "description": "Research Scientist",
+      "description": "Research Scientist America",
       "isEnabled": true
     },
     {
@@ -320,7 +320,8 @@
       "city": "Baltimore",
       "profession": "Entrepreneur",
       "description": "Startup Founder",
-      "isEnabled": true
+      "isEnabled": true,
+      "status": "Disabled"
     },
     {
       "id": "25",

@@ -17,6 +17,28 @@ export default CreatedAtColumn;
 //   return {
 //     field: field,
 //     headerName: "Created At",
+//     width: 180,
+//     type: "date",
+//     valueGetter: (params) => {
+//       // Convert raw value to Date object
+//       return params.value ? new Date(params.value) : null;
+//     },
+//     renderCell: (params) => {
+//       const createdAtDate = params.value;
+//       return createdAtDate
+//         ? createdAtDate.toLocaleString() // Format the date to a readable string
+//         : "Invalid Date";
+//     },
+//     sortable: true, // Enable sorting for this column
+//   };
+// };
+
+// export default CreatedAtColumn;
+
+// const CreatedAtColumn = ({ field }) => {
+//   return {
+//     field: field,
+//     headerName: "Created At",
 //     type: "dateTime", // Specify the column type as 'dateTime'
 //     width: 180,
 //     valueGetter: (params) => {

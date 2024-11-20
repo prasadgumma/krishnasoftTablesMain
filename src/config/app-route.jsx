@@ -11,6 +11,8 @@ import ContactsListWithFolders from "../components/tables/test.jsx";
 import AddMember from "../components/tables/add-member.js";
 import EditMember from "../components/tables/edit-member.js";
 import ViewMember from "../components/tables/view-member.js";
+import DummyTable from "../components/tables/dummy-table.js";
+
 
 const AppRoute = [
   {
@@ -27,9 +29,11 @@ const AppRoute = [
           { path: "plugins", element: <TablePlugins /> },
           { path: "plugins1", element: <MembersTable /> },
           { path: "foldersview", element: < ContactsListWithFolders /> },
+          { path: 'dummyTable', element: <DummyTable /> },
           { path: "add-member", element: <AddMember /> },
           { path: "edit/member/:id", element: <EditMember /> },
-          { path: "view/member/:id", element: <ViewMember /> }
+          { path: "view/member/:id", element: <ViewMember /> },
+
 
 
           // { path: "*", element: <ExtraError /> },

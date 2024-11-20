@@ -16,7 +16,7 @@ const DateDropdown = () => {
 
   return (
     <Box sx={{ minWidth: 150, mt: 2 }}>
-      <FormControl fullWidth size="small">
+      <FormControl fullWidth size="small" disabled>
         <InputLabel id="dropdown-label" sx={{ color: "#787877" }}>
           Select Action
         </InputLabel>
