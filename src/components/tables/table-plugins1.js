@@ -14,36 +14,39 @@ import {
   MenuItem,
   FormControl,
   Select,
+  InputLabel,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material"; // Import icons
 import TableDropdown from "./table-dropdown";
 import { DataGrid } from "@mui/x-data-grid";
 import DateRangeFilter from "./date-range-filter";
 import CreatedAtColumn from "./created-at-table";
-import DateDropdown from "./date-dropdown";
 import { v4 as uuidv4 } from "uuid";
 
 const MembersTable = () => {
   const [data, setData] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]); // Track selected rows for the current page
   const [checkedBox, setCheckedBox] = useState(true);
-  const [sortModel, setSortModel] = useState([{ field: "", sort: "" }]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 25,
   });
-
   const [filter, setFilter] = useState({
     fromDate: "",
     toDate: "",
   }); // State for date range filter
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [dummyFilters, setDummyFilters] = useState({
-    filter1: "",
-    filter2: "",
-    filter3: "",
+  const [filterModel, setFilterModel] = useState({
+    items: [],
   });
-  const [filterOption, setFilterOption] = useState("all"); // Track "All" or "Any" option
+  const [customFilters, setCustomFilters] = useState({
+    member: "",
+    age: "",
+    ageCondition: "=", // Default condition
+    filterCondition: "all", // 'all' for AND, 'any' for OR
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
+  console.log(globalSelectedRows);
 
   const [selectedColumns] = useState({
     id: true,
@@ -61,12 +64,6 @@ const MembersTable = () => {
     action: true,
   });
 
-  const [filterModel, setFilterModel] = useState({
-    items: [],
-  });
-
-  const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
-
   useEffect(() => {
     const fetchMembers = async () => {
       try {
@@ -80,6 +77,7 @@ const MembersTable = () => {
             _limit: pageSize,
             _start: start,
             _end: end,
+            _search: searchQuery,
           },
         });
 
@@ -104,41 +102,75 @@ const MembersTable = () => {
     };
 
     fetchMembers();
-  }, [paginationModel]); // Dependency array ensures the effect is run whenever paginationModel changes
+  }, [paginationModel, searchQuery]); // Dependency array ensures the effect is run whenever paginationModel changes
 
   const filteredData = data.filter((row) => {
     const { fromDate, toDate } = filter;
+    const { member, age, ageCondition, filterCondition } = customFilters;
 
-    // Normalize the createdAt date to midnight (removes time)
+    // Normalize createdAt for date filters
     const createdAtDate = new Date(row.createdAt);
 
     const normalizeDate = (date) => {
       const d = new Date(date);
-      d.setHours(0, 0, 0, 0); // Reset the time to midnight (start of the day)
+      d.setHours(0, 0, 0, 0);
       return d;
     };
 
-    // Both fromDate and toDate filter
+    // Check date range
+    let passesDateFilter = true;
     if (fromDate && toDate) {
       const startDate = normalizeDate(fromDate);
       const endDate = normalizeDate(toDate);
-      return createdAtDate >= startDate && createdAtDate <= endDate;
-    }
-
-    // Only fromDate filter
-    if (fromDate) {
+      passesDateFilter = createdAtDate >= startDate && createdAtDate <= endDate;
+    } else if (fromDate) {
       const startDate = normalizeDate(fromDate);
-      return createdAtDate >= startDate;
-    }
-
-    // Only toDate filter
-    if (toDate) {
+      passesDateFilter = createdAtDate >= startDate;
+    } else if (toDate) {
       const endDate = normalizeDate(toDate);
-      return createdAtDate <= endDate;
+      passesDateFilter = createdAtDate <= endDate;
     }
 
-    // If no filter applied, return all rows
-    return true;
+    // Check member filter
+    const matchesMember = member
+      ? row.member.toLowerCase().includes(member.toLowerCase())
+      : true;
+
+    // Apply age condition
+    const ageValue = parseInt(age, 10);
+    let matchesAge = true;
+    if (age && !isNaN(ageValue)) {
+      switch (ageCondition) {
+        case "<":
+          matchesAge = row.age < ageValue;
+          break;
+        case ">":
+          matchesAge = row.age > ageValue;
+          break;
+        case "<=":
+          matchesAge = row.age <= ageValue;
+          break;
+        case ">=":
+          matchesAge = row.age >= ageValue;
+          break;
+        case "=":
+          matchesAge = row.age === ageValue;
+          break;
+        case "!=":
+          matchesAge = row.age !== ageValue;
+          break;
+        default:
+          matchesAge = true; // Default to match all if no condition selected
+      }
+    }
+
+    // Apply AND or OR logic based on filterCondition
+    const passesCustomFilter =
+      filterCondition === "all"
+        ? matchesMember && matchesAge // AND condition
+        : matchesMember || matchesAge; // OR condition
+
+    return passesDateFilter && passesCustomFilter;
   });
 
   const columns = [
@@ -251,11 +283,6 @@ const MembersTable = () => {
     setPaginationModel(newPaginationModel);
   };
 
-  // Track selected rows for the current page
-  // const handleSelectionChange = (newSelection) => {
-  //   setSelectedRows(newSelection); // Update selected rows
-  // };
-
   // Export to CSV function
   const exportToCSV = () => {
     const headers =
@@ -287,56 +314,18 @@ const MembersTable = () => {
     }
   };
 
-  // const handleSelectAllChange = (event) => {
-  //   const { checked } = event.target;
-  //   setCheckedBox(checked);
-
-  //   if (checked) {
-  //     // Select all rows across all pages
-  //     setSelectedRows(filteredData.map((row) => row.id));
-  //   } else {
-  //     // Deselect all rows
-  //     setSelectedRows([]);
-  //   }
-  // };
   const handleApplyClick = () => {
-    if (selectedRows.length > 0) {
-      alert(`Selected row IDs: ${selectedRows.join(", ")}`);
+    if (globalSelectedRows.length > 0) {
+      alert(`Selected row IDs: ${globalSelectedRows.join(", ")}`);
     } else {
       alert("No rows selected.");
     }
   };
 
-  const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-    setDummyFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
-
-  // Handle selection of "All" or "Any" option
-  const handleOptionChange = (event) => {
-    setFilterOption(event.target.value);
-  };
-
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
   };
-  const handleDeleteAll = () => {
-    if (window.confirm("Are you sure you want to delete all members?")) {
-      axios
-        .delete("http://localhost:7779/members") // Adjust this endpoint based on your backend
-        .then(() => {
-          // Reset the data to an empty array after successful deletion
-          setData([]);
-          alert("All members have been deleted.");
-        })
-        .catch((error) => {
-          console.error("Error deleting all members:", error);
-        });
-    }
-  };
+
   const handleFilterChangeDate = (newFilterModel) => {
     setFilterModel(newFilterModel); // Update filter model
   };
@@ -365,11 +354,12 @@ const MembersTable = () => {
 
       const allIds = filteredData.map((row) => row.id);
       if (checked) {
+        console.log(allIds, "allids");
         // Select all rows across the filtered data
         setGlobalSelectedRows((prev) =>
           Array.from(new Set([...prev, ...allIds]))
         );
-        setSelectedRows(allIds); // Select all rows on the current page
+        setGlobalSelectedRows(allIds); // Select all rows on the current page
         setCheckedBox(checked);
       } else {
         // Deselect all rows
@@ -379,26 +369,9 @@ const MembersTable = () => {
         setCheckedBox((prev) => !prev); // Reset local selection for the current page
       }
     }
-
-    // else {
-    //   // When individual row(s) are selected/deselected
-    //   const selectedIds = eventOrIds; // Array of selected row IDs
-    //   setSelectedRows(selectedIds); // Update selected rows for the current page
-
-    //   const allIds = filteredData.map((row) => row.id); // Get all IDs for the filtered rows
-    //   setCheckedBox(selectedIds.length === allIds.length); // Check if all filtered rows are selected
-
-    //   // Update global selection
-    //   setGlobalSelectedRows((prev) => {
-    //     const updatedGlobalSelection = Array.from(
-    //       new Set([...prev, ...selectedIds])
-    //     );
-    //     return updatedGlobalSelection;
-    //   });
-    // }
   };
 
-  const showThebottomButtons = selectedRows.length > 0;
+  const showThebottomButtons = globalSelectedRows.length > 0;
 
   return (
     <Box pb={2}>
@@ -436,26 +409,32 @@ const MembersTable = () => {
                   alignItems="center" // Vertically center the items
                   justifyContent="space-between" // This will push items to the left and right
                 >
-                  {/* DateRangeFilter Section (Left) */}
                   <Grid item xs={4} sx={{ ml: "25px", mt: "20px" }}>
-                    <DateRangeFilter filter={filter} setFilter={setFilter} />
+                    <TextField
+                      label="Search"
+                      variant="outlined"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)} // Update the search query state
+                      sx={{
+                        mb: 2.5, // Optional margin for spacing
+                        "& .MuiInputBase-root": {
+                          height: "35px", // Set the height of the input field
+                          padding: "0 8px", // Adjust padding to keep it compact
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          height: "45px", // Ensure the outline matches the input field height
+                        },
+                        "& .MuiInputLabel-root": {
+                          top: "-6px", // Adjust label position to be vertically aligned
+                          fontSize: "1rem", // Optional: smaller label text
+                        },
+                      }}
+                    />
                   </Grid>
 
                   {/* Buttons and DateDropdown Section (Right) */}
                   <Grid item>
-                    <Box display="flex" alignItems="center" gap={2}>
-                      <Box width={"20%"} mr={7} mb={2}>
-                        <DateDropdown />
-                      </Box>
-                      <Button
-                        component={Link}
-                        to="/table/add-member"
-                        variant="outlined"
-                        color="#787879"
-                        // sx={{ color: "#fff", mr: 2 }}
-                      >
-                        Add +
-                      </Button>
+                    <Box display="flex" alignItems="center" gap={2} m={2}>
                       <Button
                         variant="outlined"
                         color="#787879"
@@ -463,13 +442,7 @@ const MembersTable = () => {
                       >
                         Export to CSV
                       </Button>
-                      <Button
-                        variant="outlined"
-                        color="#787879"
-                        onClick={handleDeleteAll}
-                      >
-                        Delete All
-                      </Button>
+
                       {/* Add Button for opening the Drawer */}
                       <Button
                         variant="outlined"
@@ -483,80 +456,19 @@ const MembersTable = () => {
                 </Grid>
               </Grid>
 
-              {/* <DataGrid
-                rows={filteredData}
-                columns={columns}
-                checkboxSelection
-                disableSelectionOnClick={false}
-                sortModel={sortModel}
-                onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
-                autoHeight
-                // onSelectionModelChange={(e)=>handleSelectionChange(e)}
-                onRowSelectionModelChange={handleSelectionChange}
-                pagination
-                pageSize={paginationModel.pageSize} // Number of rows per page
-                page={paginationModel.page}
-                rowCount={300}
-                paginationMode="server"
-                // rowsPerPageOptions={[10, 25, 50, 100]}
-                pageSizeOptions={[10, 25, 50, 100]}
-                onPaginationModelChange={handlePaginationChange}
-                filterModel={filterModel} // Bind the filter model
-                onFilterModelChange={handleFilterChangeDate} // Update the filter model on change
-                sx={{
-                  "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root": {
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-columnHeader": {
-                    backgroundColor: "#787877",
-                    color: "white",
-                    maxHeight: 70,
-                  },
-                  "& .MuiDataGrid-columnHeaderTitle": {
-                    color: "white",
-                  },
-
-                  "& .MuiDataGrid-columnMenuIcon": {
-                    color: "#fffff !important",
-                  },
-                  "& .MuiDataGrid-menu": {
-                    backgroundColor: "#1976d2",
-                  },
-                  "& .MuiMenuItem-root": {
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-menuItem-root:hover": {
-                    backgroundColor: "#1565c0",
-                  },
-                  "& .MuiDataGrid-sortIcon": {
-                    opacity: 1,
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-menuIconButton": {
-                    opacity: 1,
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-filterIcon": {
-                    opacity: 1,
-                    color: "white",
-                  },
-                }}
-              /> */}
-
               <DataGrid
                 rows={filteredData}
                 columns={columns}
                 checkboxSelection
-                disableSelectionOnClick={true}
+                disableSelectionOnClick={false}
                 rowSelectionModel={globalSelectedRows}
-                // onRowSelectionModelChange={handleSelection}
                 onRowSelectionModelChange={handleSelectionChange}
                 pagination
                 pageSize={paginationModel.pageSize}
                 page={paginationModel.page}
                 initialState={{
                   pagination: {
-                    paginationModel: { page: 0, pageSize: 5 },
+                    paginationModel: { page: 0, pageSize: 25 },
                   },
                 }}
                 pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
@@ -609,8 +521,8 @@ const MembersTable = () => {
             </Box>
 
             {/* Conditional rendering of Apply/Cancel buttons */}
-            {console.log("showThebottomButtons", selectedRows.length > 0)}
-            {globalSelectedRows.length > 0 && (
+
+            {showThebottomButtons && (
               <Box
                 key={uuidv4()}
                 sx={{
@@ -641,7 +553,7 @@ const MembersTable = () => {
                   variant="outlined"
                   color="white"
                   sx={{ maxHeight: 35, mt: 1.2, color: "#ffff" }}
-                  onClick={() => setSelectedRows([])} // Reset selection on cancel
+                  onClick={() => setGlobalSelectedRows([])} // Reset selection on cancel
                 >
                   Cancel
                 </Button>
@@ -672,52 +584,99 @@ const MembersTable = () => {
       </Grid>
 
       {/* Drawer Component */}
+
       <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
         <Box p={2} width="500px">
           <Typography variant="h6" color="textPrimary">
             My Filters
           </Typography>
-
-          <FormControl fullWidth margin="normal" sx={{ alignItems: "center" }}>
-            <Select
-              sx={{ width: "20%" }}
-              value={filterOption}
-              onChange={handleOptionChange}
-              label="Filter Condition"
-            >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="any">Any</MenuItem>
-            </Select>
-          </FormControl>
-
+          <Box textAlign={"center"}>
+            <FormControl sx={{ width: "50%" }} margin="normal">
+              <InputLabel>Filter Condition</InputLabel>
+              <Select
+                value={customFilters.filterCondition}
+                onChange={(e) => {
+                  const filterCondition = e.target.value;
+                  setCustomFilters((prev) => ({
+                    ...prev,
+                    filterCondition,
+                  }));
+                }}
+              >
+                <MenuItem value="all">All (AND)</MenuItem>
+                <MenuItem value="any">Any (OR)</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
           <TextField
-            label="Filter 1"
+            label="Member"
             fullWidth
-            name="filter1"
-            value={dummyFilters.filter1}
-            onChange={handleFilterChange}
+            name="member"
+            value={customFilters.member}
+            onChange={(e) =>
+              setCustomFilters((prev) => ({
+                ...prev,
+                member: e.target.value,
+              }))
+            }
             margin="normal"
           />
+          <Box mt={2}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <FormControl fullWidth sx={{ mt: 2 }}>
+                  <InputLabel>Age Condition</InputLabel>
+                  <Select
+                    value={customFilters.ageCondition}
+                    onChange={(e) =>
+                      setCustomFilters((prev) => ({
+                        ...prev,
+                        ageCondition: e.target.value,
+                      }))
+                    }
+                  >
+                    <MenuItem value="=">=</MenuItem>
+                    <MenuItem value="!=">!=</MenuItem>
+                    <MenuItem value="<">&lt;</MenuItem>
+                    <MenuItem value=">">&gt;</MenuItem>
+                    <MenuItem value="<=">&lt;=</MenuItem>
+                    <MenuItem value=">=">&gt;=</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
 
-          <Typography variant="body1" align="center" sx={{ mt: 2, mb: 2 }}>
-            {filterOption === "all" ? "AND" : "OR"}
-          </Typography>
-
-          <TextField
-            label="Filter 2"
-            fullWidth
-            name="filter2"
-            value={dummyFilters.filter2}
-            onChange={handleFilterChange}
-            margin="normal"
-          />
+              <Grid item xs={6}>
+                <TextField
+                  label="Age"
+                  fullWidth
+                  name="age"
+                  value={customFilters.age}
+                  onChange={(e) =>
+                    setCustomFilters((prev) => ({
+                      ...prev,
+                      age: e.target.value,
+                    }))
+                  }
+                  margin="normal"
+                />
+              </Grid>
+            </Grid>
+          </Box>
         </Box>
+
         <Box m={2}>
-          <Button variant="outlined" color="#787879" disabled>
-            + Add Filter
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() =>
+              setCustomFilters({ member: "", age: "", filterCondition: "all" })
+            }
+          >
+            Reset Filters
           </Button>
         </Box>
         <Box m={2}>
+          <Typography m={2}>Date Filters</Typography>
           <DateRangeFilter filter={filter} setFilter={setFilter} />
         </Box>
       </Drawer>
@@ -726,5 +685,3 @@ const MembersTable = () => {
 };
 
 export default MembersTable;
-
-// ----------------------------------------- Major

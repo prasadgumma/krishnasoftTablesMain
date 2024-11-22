@@ -1129,163 +1129,159 @@
 
 // export default DummyTable;
 
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
-import {
-  Typography,
-  Button,
-  Box,
-  Grid,
-  Card,
-  IconButton,
-  Checkbox,
-} from "@mui/material";
-import { Edit, Delete, Visibility } from "@mui/icons-material";
-import { DataGrid } from "@mui/x-data-grid";
-import { v4 as uuidv4 } from "uuid";
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { Link } from "react-router-dom";
+// import {
+//   Typography,
+//   Box,
+//   Grid,
+//   Card,
+//   IconButton,
+// } from "@mui/material";
+// import { Edit, Delete, Visibility } from "@mui/icons-material";
+// import { DataGrid } from "@mui/x-data-grid";
 
-const DummyTable = () => {
-  const [data, setData] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [filter, setFilter] = useState({ fromDate: "", toDate: "" });
-  const [openDrawer, setOpenDrawer] = useState(false);
+// const DummyTable = () => {
+//   const [data, setData] = useState([]);
+//   const [ setSelectedRows] = useState([]);
+//   const [filter] = useState({ fromDate: "", toDate: "" });
 
-  useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const response = await axios.get("http://localhost:7779/members");
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching members:", error);
-      }
-    };
+//   useEffect(() => {
+//     const fetchMembers = async () => {
+//       try {
+//         const response = await axios.get("http://localhost:7779/members");
+//         setData(response.data);
+//       } catch (error) {
+//         console.error("Error fetching members:", error);
+//       }
+//     };
 
-    fetchMembers();
-  }, []);
+//     fetchMembers();
+//   }, []);
 
-  const filteredData = data.filter((row) => {
-    const { fromDate, toDate } = filter;
-    const createdAtDate = new Date(row.createdAt);
-    const normalizeDate = (date) => {
-      const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    };
+//   const filteredData = data.filter((row) => {
+//     const { fromDate, toDate } = filter;
+//     const createdAtDate = new Date(row.createdAt);
+//     const normalizeDate = (date) => {
+//       const d = new Date(date);
+//       d.setHours(0, 0, 0, 0);
+//       return d;
+//     };
 
-    if (fromDate && toDate) {
-      return (
-        createdAtDate >= normalizeDate(fromDate) &&
-        createdAtDate <= normalizeDate(toDate)
-      );
-    }
+//     if (fromDate && toDate) {
+//       return (
+//         createdAtDate >= normalizeDate(fromDate) &&
+//         createdAtDate <= normalizeDate(toDate)
+//       );
+//     }
 
-    if (fromDate) {
-      return createdAtDate >= normalizeDate(fromDate);
-    }
+//     if (fromDate) {
+//       return createdAtDate >= normalizeDate(fromDate);
+//     }
 
-    if (toDate) {
-      return createdAtDate <= normalizeDate(toDate);
-    }
+//     if (toDate) {
+//       return createdAtDate <= normalizeDate(toDate);
+//     }
 
-    return true;
-  });
+//     return true;
+//   });
 
-  const columns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "member", headerName: "Member", width: 150 },
-    { field: "createdAt", headerName: "Created At", width: 180 },
-    { field: "age", headerName: "Age", width: 90 },
-    { field: "education", headerName: "Education", width: 130 },
-    { field: "city", headerName: "City", width: 100 },
-    {
-      field: "action",
-      headerName: "Actions",
-      width: 150,
-      renderCell: (params) => (
-        <Box>
-          <IconButton
-            component={Link}
-            to={`/table/edit/member/${params.row.id}`}
-            color="primary"
-            sx={{ mr: 1 }}
-          >
-            <Edit />
-          </IconButton>
-          <IconButton color="error" onClick={() => deleteHandle(params.row.id)}>
-            <Delete />
-          </IconButton>
-          <IconButton
-            component={Link}
-            to={`/table/view/member/${params.row.id}`}
-            color="success"
-            sx={{ mr: 1 }}
-          >
-            <Visibility />
-          </IconButton>
-        </Box>
-      ),
-    },
-  ];
+//   const columns = [
+//     { field: "id", headerName: "ID", width: 70 },
+//     { field: "member", headerName: "Member", width: 150 },
+//     { field: "createdAt", headerName: "Created At", width: 180 },
+//     { field: "age", headerName: "Age", width: 90 },
+//     { field: "education", headerName: "Education", width: 130 },
+//     { field: "city", headerName: "City", width: 100 },
+//     {
+//       field: "action",
+//       headerName: "Actions",
+//       width: 150,
+//       renderCell: (params) => (
+//         <Box>
+//           <IconButton
+//             component={Link}
+//             to={`/table/edit/member/${params.row.id}`}
+//             color="primary"
+//             sx={{ mr: 1 }}
+//           >
+//             <Edit />
+//           </IconButton>
+//           <IconButton color="error" onClick={() => deleteHandle(params.row.id)}>
+//             <Delete />
+//           </IconButton>
+//           <IconButton
+//             component={Link}
+//             to={`/table/view/member/${params.row.id}`}
+//             color="success"
+//             sx={{ mr: 1 }}
+//           >
+//             <Visibility />
+//           </IconButton>
+//         </Box>
+//       ),
+//     },
+//   ];
 
-  const deleteHandle = (id) => {
-    if (window.confirm("Would you like to delete this row?")) {
-      axios.delete(`http://localhost:7779/members/${id}`).then(() => {
-        setData((prevData) => prevData.filter((member) => member.id !== id));
-      });
-    }
-  };
+//   const deleteHandle = (id) => {
+//     if (window.confirm("Would you like to delete this row?")) {
+//       axios.delete(`http://localhost:7779/members/${id}`).then(() => {
+//         setData((prevData) => prevData.filter((member) => member.id !== id));
+//       });
+//     }
+//   };
 
-  return (
-    <Box pb={2}>
-      <Grid container spacing={6}>
-        <Grid item xs={12}>
-          <Card sx={{ height: "100%" }}>
-            <Box
-              mx={2}
-              mt={2}
-              py={1}
-              px={2}
-              bgcolor="info.main"
-              borderRadius="lg"
-            >
-              <Typography
-                variant="h5"
-                color="#787879"
-                align="left"
-                fontFamily={"serif"}
-              >
-                Members Table
-              </Typography>
-            </Box>
-            <Box p={2}>
-              <DataGrid
-                rows={filteredData}
-                columns={columns}
-                checkboxSelection
-                onRowSelectionModelChange={setSelectedRows}
-                pagination
-                pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
-                initialState={{
-                  pagination: { paginationModel: { pageSize: 25 } },
-                }}
-                autoHeight
-                sx={{
-                  "& .MuiDataGrid-columnHeader": {
-                    backgroundColor: "#787877",
-                    color: "white",
-                  },
-                }}
-              />
-            </Box>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
-  );
-};
+//   return (
+//     <Box pb={2}>
+//       <Grid container spacing={6}>
+//         <Grid item xs={12}>
+//           <Card sx={{ height: "100%" }}>
+//             <Box
+//               mx={2}
+//               mt={2}
+//               py={1}
+//               px={2}
+//               bgcolor="info.main"
+//               borderRadius="lg"
+//             >
+//               <Typography
+//                 variant="h5"
+//                 color="#787879"
+//                 align="left"
+//                 fontFamily={"serif"}
+//               >
+//                 Members Table
+//               </Typography>
+//             </Box>
+//             <Box p={2}>
+//               <DataGrid
+//                 rows={filteredData}
+//                 columns={columns}
+//                 checkboxSelection
+//                 onRowSelectionModelChange={setSelectedRows}
+//                 pagination
+//                 pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
+//                 initialState={{
+//                   pagination: { paginationModel: { pageSize: 25 } },
+//                 }}
+//                 autoHeight
+//                 sx={{
+//                   "& .MuiDataGrid-columnHeader": {
+//                     backgroundColor: "#787877",
+//                     color: "white",
+//                   },
+//                 }}
+//               />
+//             </Box>
+//           </Card>
+//         </Grid>
+//       </Grid>
+//     </Box>
+//   );
+// };
 
-export default DummyTable;
+// export default DummyTable;
 
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
@@ -1303,36 +1299,39 @@ export default DummyTable;
 //   MenuItem,
 //   FormControl,
 //   Select,
+//   InputLabel,
+//   InputAdornment,
 // } from "@mui/material";
 // import { Edit, Delete, Visibility } from "@mui/icons-material"; // Import icons
 // import TableDropdown from "./table-dropdown";
-// import { DataGrid } from "@mui/x-data-grid";
+// import { DataGrid, GridSearchIcon } from "@mui/x-data-grid";
 // import DateRangeFilter from "./date-range-filter";
 // import CreatedAtColumn from "./created-at-table";
-// import DateDropdown from "./date-dropdown";
 // import { v4 as uuidv4 } from "uuid";
+// import dayjs from "dayjs";
+// import DateFilterPopover from "./date-filter";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 // const MembersTable = () => {
 //   const [data, setData] = useState([]);
+
+//   // const [sortModel, setSortModel] = useState([{ field: "", sort: "" }]);
 //   const [selectedRows, setSelectedRows] = useState([]); // Track selected rows for the current page
-//   const [checkedBox, setCheckedBox] = useState(true);
-//   const [sortModel, setSortModel] = useState([{ field: "", sort: "" }]);
+//   const [checkedBox, setCheckedBox] = useState(true); // Select All checkbox state
+//   const [globalSelectedRows, setGlobalSelectedRows] = useState([]); // Track global selected rows across pages
+
 //   const [paginationModel, setPaginationModel] = useState({
 //     page: 0,
 //     pageSize: 25,
 //   });
+
+//   // const apiRef = useGridApiRef();
 
 //   const [filter, setFilter] = useState({
 //     fromDate: "",
 //     toDate: "",
 //   }); // State for date range filter
 //   const [openDrawer, setOpenDrawer] = useState(false);
-//   const [dummyFilters, setDummyFilters] = useState({
-//     filter1: "",
-//     filter2: "",
-//     filter3: "",
-//   });
-//   const [filterOption, setFilterOption] = useState("all"); // Track "All" or "Any" option
 
 //   const [selectedColumns] = useState({
 //     id: true,
@@ -1354,79 +1353,13 @@ export default DummyTable;
 //     items: [],
 //   });
 
-//   useEffect(() => {
-//     const fetchMembers = async () => {
-//       try {
-//         const { page, pageSize } = paginationModel;
-//         const start = page * pageSize;
-//         const end = (page + 1) * pageSize;
-//         // Make the API call with pagination parameters
-//         const response = await axios.get("http://localhost:7779/members", {
-//           params: {
-//             _page: page + 1, // Assuming your API expects 1-based page index
-//             _limit: pageSize,
-//             _start: start,
-//             _end: end,
-//           },
-//         });
-
-//         const dataWithCreatedAt = response.data.map((member) => {
-//           // Use localStorage or state to persist createdAt
-//           const existingCreatedAt =
-//             member.createdAt || localStorage.getItem(`createdAt_${member.id}`);
-//           const createdAt = existingCreatedAt || new Date().toISOString();
-
-//           // Store the createdAt value in localStorage (or any persistent storage)
-//           if (!existingCreatedAt) {
-//             localStorage.setItem(`createdAt_${member.id}`, createdAt);
-//           }
-
-//           return { ...member, createdAt };
-//         });
-
-//         setData(dataWithCreatedAt);
-//       } catch (error) {
-//         console.error("Error fetching members:", error);
-//       }
-//     };
-
-//     fetchMembers();
-//   }, [paginationModel]); // Dependency array ensures the effect is run whenever paginationModel changes
-
-//   const filteredData = data.filter((row) => {
-//     const { fromDate, toDate } = filter;
-
-//     // Normalize the createdAt date to midnight (removes time)
-//     const createdAtDate = new Date(row.createdAt);
-
-//     const normalizeDate = (date) => {
-//       const d = new Date(date);
-//       d.setHours(0, 0, 0, 0); // Reset the time to midnight (start of the day)
-//       return d;
-//     };
-
-//     // Both fromDate and toDate filter
-//     if (fromDate && toDate) {
-//       const startDate = normalizeDate(fromDate);
-//       const endDate = normalizeDate(toDate);
-//       return createdAtDate >= startDate && createdAtDate <= endDate;
-//     }
-
-//     // Only fromDate filter
-//     if (fromDate) {
-//       const startDate = normalizeDate(fromDate);
-//       return createdAtDate >= startDate;
-//     }
-
-//     // Only toDate filter
-//     if (toDate) {
-//       const endDate = normalizeDate(toDate);
-//       return createdAtDate <= endDate;
-//     }
-
-//     // If no filter applied, return all rows
-//     return true;
+//   const [customFilters, setCustomFilters] = useState({
+//     member: "",
+//     age: "",
+//     ageCondition: "=", // Default condition
+//     filterCondition: "all", // 'all' for AND, 'any' for OR
 //   });
+//   const [searchQuery, setSearchQuery] = useState("");
 
 //   const columns = [
 //     { field: "id", headerName: "ID", width: 70, hide: !selectedColumns.id },
@@ -1526,6 +1459,46 @@ export default DummyTable;
 //     },
 //   ];
 
+//   useEffect(() => {
+//     const fetchMembers = async () => {
+//       try {
+//         const { page, pageSize } = paginationModel;
+//         const response = await axios.get("http://localhost:7779/members", {
+//           params: {
+//             _page: page + 1,
+//             _limit: pageSize,
+//             _search: searchQuery,
+//           },
+//         });
+
+//         const dataWithCreatedAt = response.data.map((member) => {
+//           const existingCreatedAt =
+//             member.createdAt || localStorage.getItem(`createdAt_${member.id}`);
+//           const createdAt = existingCreatedAt || new Date().toISOString();
+
+//           if (!existingCreatedAt) {
+//             localStorage.setItem(`createdAt_${member.id}`, createdAt);
+//           }
+
+//           return { ...member, createdAt };
+//         });
+
+//         setData(dataWithCreatedAt);
+
+//         // Check if all filtered rows are selected
+//         const allIds = data.map((row) => row.id);
+//         const allSelected =
+//           allIds.length > 0 &&
+//           allIds.every((id) => globalSelectedRows.includes(id));
+//         setCheckedBox(allSelected);
+//       } catch (error) {
+//         console.error("Error fetching members:", error);
+//       }
+//     };
+
+//     fetchMembers();
+//   }, [paginationModel, searchQuery, globalSelectedRows]); // Add globalSelectedRows as a dependency
+
 //   const deleteHandle = (id) => {
 //     if (window.confirm("Would you like to delete this row?")) {
 //       axios.delete(`http://localhost:7779/members/${id}`).then(() => {
@@ -1534,13 +1507,98 @@ export default DummyTable;
 //     }
 //   };
 
+//   const filteredData = data.filter((row) => {
+//     const { fromDate, toDate, dateOption, exactDate } = filter;
+//     const { member, age, ageCondition, filterCondition } = customFilters;
+
+//     // Normalize createdAt for date filters
+//     const createdAtDate = dayjs(row.createdAt);
+//     const today = dayjs();
+
+//     const normalizeDate = (date) => {
+//       const d = dayjs(date).startOf("day");
+//       return d;
+//     };
+
+//     // Handle date filters based on dateOption
+//     let passesDateFilter = true;
+
+//     switch (dateOption) {
+//       case "today":
+//         passesDateFilter = createdAtDate.isSame(today, "day");
+//         break;
+//       case "exactDate":
+//         passesDateFilter = exactDate
+//           ? createdAtDate.isSame(normalizeDate(exactDate), "day")
+//           : true;
+//         break;
+//       case "beforeDate":
+//         passesDateFilter = fromDate
+//           ? createdAtDate.isBefore(normalizeDate(fromDate), "day")
+//           : true;
+//         break;
+//       case "afterDate":
+//         passesDateFilter = toDate
+//           ? createdAtDate.isAfter(normalizeDate(toDate), "day")
+//           : true;
+//         break;
+//       default:
+//         if (fromDate && toDate) {
+//           passesDateFilter =
+//             createdAtDate >= normalizeDate(fromDate) &&
+//             createdAtDate <= normalizeDate(toDate);
+//         } else if (fromDate) {
+//           passesDateFilter = createdAtDate >= normalizeDate(fromDate);
+//         } else if (toDate) {
+//           passesDateFilter = createdAtDate <= normalizeDate(toDate);
+//         }
+//     }
+
+//     // Check member filter
+//     const matchesMember = member
+//       ? row.member.toLowerCase().includes(member.toLowerCase())
+//       : true;
+
+//     // Apply age condition
+//     const ageValue = parseInt(age, 10);
+//     let matchesAge = true;
+//     if (age && !isNaN(ageValue)) {
+//       switch (ageCondition) {
+//         case "<":
+//           matchesAge = row.age < ageValue;
+//           break;
+//         case ">":
+//           matchesAge = row.age > ageValue;
+//           break;
+//         case "<=":
+//           matchesAge = row.age <= ageValue;
+//           break;
+//         case ">=":
+//           matchesAge = row.age >= ageValue;
+//           break;
+//         case "=":
+//           matchesAge = row.age === ageValue;
+//           break;
+//         case "!=":
+//           matchesAge = row.age !== ageValue;
+//           break;
+//         default:
+//           matchesAge = true; // Default to match all if no condition selected
+//       }
+//     }
+
+//     // Apply AND or OR logic based on filterCondition
+//     const passesCustomFilter =
+//       filterCondition === "all"
+//         ? matchesMember && matchesAge // AND condition
+//         : matchesMember || matchesAge; // OR condition
+
+//     // Combine both date and custom filters
+//     return passesDateFilter && passesCustomFilter;
+//   });
+
 //   const handlePaginationChange = (newPaginationModel) => {
 //     setPaginationModel(newPaginationModel);
-//   };
-
-//   // Track selected rows for the current page
-//   const handleSelectionChange = (newSelection) => {
-//     setSelectedRows(newSelection); // Update selected rows
 //   };
 
 //   // Export to CSV function
@@ -1574,37 +1632,67 @@ export default DummyTable;
 //     }
 //   };
 
-//   const handleSelectAllChange = (event) => {
-//     const { checked } = event.target;
-//     setCheckedBox(checked);
+//   const handleSelectionChange = (newSelection) => {
+//     // Update selected rows for the current page
+//     setSelectedRows(newSelection);
 
-//     if (checked) {
-//       // Select all rows across all pages
-//       setSelectedRows(filteredData.map((row) => row.id));
+//     // Determine if "Select All" should be checked (select all rows on the current page)
+//     const allIds = filteredData.map((row) => row.id);
+//     setCheckedBox(newSelection.length === allIds.length);
+
+//     // Update global selection (combine with previous selection)
+//     setGlobalSelectedRows((prev) => {
+//       const updatedGlobalSelection = Array.from(
+//         new Set([...prev, ...newSelection])
+//       );
+//       return updatedGlobalSelection;
+//     });
+//   };
+
+//   const handleSelection = (eventOrIds) => {
+//     if (typeof eventOrIds === "object" && eventOrIds.target) {
+//       // Handle "Select All" checkbox change
+//       const { checked } = eventOrIds.target;
+//       setCheckedBox(checked);
+
+//       const allIds = filteredData.map((row) => row.id);
+//       if (checked) {
+//         // Select all rows across the filtered data
+//         setGlobalSelectedRows((prev) =>
+//           Array.from(new Set([...prev, ...allIds]))
+//         );
+//         setSelectedRows(allIds); // Select all rows on the current page
+//       } else {
+//         // Deselect all rows
+//         setGlobalSelectedRows(
+//           (prev) => prev.filter((id) => !allIds.includes(id)) // Remove filtered rows from global selection
+//         );
+//         setCheckedBox([]); // Reset local selection for the current page
+//       }
 //     } else {
-//       // Deselect all rows
-//       setSelectedRows([]);
+//       // When individual row(s) are selected/deselected
+//       const selectedIds = eventOrIds; // Array of selected row IDs
+//       setSelectedRows(selectedIds); // Update selected rows for the current page
+
+//       const allIds = filteredData.map((row) => row.id); // Get all IDs for the filtered rows
+//       setCheckedBox(selectedIds.length === allIds.length); // Check if all filtered rows are selected
+
+//       // Update global selection
+//       setGlobalSelectedRows((prev) => {
+//         const updatedGlobalSelection = Array.from(
+//           new Set([...prev, ...selectedIds])
+//         );
+//         return updatedGlobalSelection;
+//       });
 //     }
 //   };
+
 //   const handleApplyClick = () => {
 //     if (selectedRows.length > 0) {
 //       alert(`Selected row IDs: ${selectedRows.join(", ")}`);
 //     } else {
 //       alert("No rows selected.");
 //     }
-//   };
-
-//   const handleFilterChange = (event) => {
-//     const { name, value } = event.target;
-//     setDummyFilters((prevFilters) => ({
-//       ...prevFilters,
-//       [name]: value,
-//     }));
-//   };
-
-//   // Handle selection of "All" or "Any" option
-//   const handleOptionChange = (event) => {
-//     setFilterOption(event.target.value);
 //   };
 
 //   const toggleDrawer = () => {
@@ -1618,245 +1706,512 @@ export default DummyTable;
 //   const showThebottomButtons = selectedRows.length > 0;
 
 //   return (
-//     <Box pb={2}>
-//       <Grid container spacing={6}>
-//         <Grid item xs={12}>
-//           <Card sx={{ height: "100%" }}>
-//             <Box
-//               mx={2}
-//               mt={2}
-//               py={1}
-//               px={2}
-//               variant="gradient"
-//               bgColor="info"
-//               borderRadius="lg"
-//               coloredShadow="info"
-//             >
-//               <Typography
-//                 variant="h5"
-//                 color="#787879"
-//                 align="left"
-//                 fontFamily={"serif"}
+//     <LocalizationProvider>
+//       <Box pb={2}>
+//         <Grid container spacing={6}>
+//           <Grid item xs={12}>
+//             <Card sx={{ height: "100%" }}>
+//               <Box
+//                 mx={2}
+//                 mt={2}
+//                 py={1}
+//                 px={2}
+//                 variant="gradient"
+//                 bgColor="info"
+//                 borderRadius="lg"
+//                 coloredShadow="info"
 //               >
-//                 Members Table
-//               </Typography>
-//             </Box>
-//             <Box p={2}>
-//               <Grid
-//                 container
-//                 spacing={2}
-//                 alignItems="right" // Vertically center the items
-//               >
+//                 <Typography
+//                   variant="h5"
+//                   color="#787879"
+//                   align="left"
+//                   fontFamily={"serif"}
+//                   mb={1}
+//                 >
+//                   Members Table
+//                 </Typography>
+//                 <Box>
+//                   <TextField
+//                     variant="filled"
+//                     placeholder="Search..."
+//                     size="small"
+//                     value={customFilters.member}
+//                     onChange={(e) =>
+//                       setCustomFilters((prev) => ({
+//                         ...prev,
+//                         member: e.target.value,
+//                       }))
+//                     }
+//                     InputProps={{
+//                       startAdornment: (
+//                         <InputAdornment position="start">
+//                           <GridSearchIcon />
+//                         </InputAdornment>
+//                       ),
+//                     }}
+//                     style={{ width: "300px" }}
+//                   />
+//                 </Box>
+//               </Box>
+//               <Box p={2}>
 //                 <Grid
 //                   container
 //                   spacing={2}
-//                   alignItems="center" // Vertically center the items
-//                   justifyContent="space-between" // This will push items to the left and right
+//                   alignItems="right" // Vertically center the items
 //                 >
-//                   {/* DateRangeFilter Section (Left) */}
-//                   <Grid item xs={4} sx={{ ml: "25px", mt: "20px" }}>
-//                     {/* <DateRangeFilter filter={filter} setFilter={setFilter} /> */}
-//                   </Grid>
-
-//                   {/* Buttons and DateDropdown Section (Right) */}
-//                   <Grid item>
-//                     <Box display="flex" alignItems="center" gap={2} m={1}>
-//                       <Button
+//                   <Grid
+//                     container
+//                     spacing={2}
+//                     alignItems="center" // Vertically center the items
+//                     justifyContent="space-between" // This will push items to the left and right
+//                   >
+//                     {/* DateRangeFilter Section (Left) */}
+//                     <Grid item xs={4} sx={{ ml: "25px", m: "20px" }}>
+//                       {/* <DateRangeFilter filter={filter} setFilter={setFilter} /> */}
+//                       <DateFilterPopover
+//                         filter={filter}
+//                         setFilter={setFilter}
+//                       />
+//                     </Grid>
+//                     {/* <Box> */}
+//                     <Grid item xs={4} sx={{ ml: "25px", m: "10px" }}>
+//                       <TextField
+//                         label="Search"
 //                         variant="outlined"
-//                         color="#787879"
-//                         onClick={exportToCSV}
-//                       >
-//                         Export to CSV
-//                       </Button>
+//                         value={searchQuery}
+//                         onChange={(e) => setSearchQuery(e.target.value)} // Update the search query state
+//                         sx={{ marginBottom: 2 }} // Optional styling
+//                       />
+//                     </Grid>
+//                     {/* </Box> */}
 
-//                       <Button
-//                         variant="outlined"
-//                         color="#787879"
-//                         onClick={toggleDrawer}
-//                       >
-//                         My Filters
-//                       </Button>
-//                     </Box>
+//                     {/* Buttons and DateDropdown Section (Right) */}
+//                     <Grid item>
+//                       <Box display="flex" alignItems="center" gap={2} m={1.5}>
+//                         <Button
+//                           variant="outlined"
+//                           color="#787879"
+//                           onClick={exportToCSV}
+//                         >
+//                           Export to CSV
+//                         </Button>
+
+//                         <Button
+//                           variant="outlined"
+//                           color="#787879"
+//                           onClick={toggleDrawer}
+//                         >
+//                           My Filters
+//                         </Button>
+//                       </Box>
+//                     </Grid>
 //                   </Grid>
 //                 </Grid>
-//               </Grid>
 
-//               <DataGrid
-//                 rows={filteredData}
-//                 columns={columns}
-//                 checkboxSelection
-//                 disableSelectionOnClick={false}
-//                 sortModel={sortModel}
-//                 onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
-//                 autoHeight
-//                 // onSelectionModelChange={(e)=>handleSelectionChange(e)}
-//                 onRowSelectionModelChange={handleSelectionChange}
-//                 pagination
-//                 pageSize={paginationModel.pageSize} // Number of rows per page
-//                 page={paginationModel.page}
-//                 rowCount={300}
-//                 paginationMode="server"
-//                 // rowsPerPageOptions={[10, 25, 50, 100]}
-//                 pageSizeOptions={[10, 25, 50, 100]}
-//                 onPaginationModelChange={handlePaginationChange}
-//                 filterModel={filterModel} // Bind the filter model
-//                 onFilterModelChange={handleFilterChangeDate} // Update the filter model on change
-//                 sx={{
-//                   "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root": {
-//                     color: "white",
-//                   },
-//                   "& .MuiDataGrid-columnHeader": {
-//                     backgroundColor: "#787877",
-//                     color: "white",
-//                     maxHeight: 70,
-//                   },
-//                   "& .MuiDataGrid-columnHeaderTitle": {
-//                     color: "white",
-//                   },
-
-//                   "& .MuiDataGrid-columnMenuIcon": {
-//                     color: "#fffff !important",
-//                   },
-//                   "& .MuiDataGrid-menu": {
-//                     backgroundColor: "#1976d2",
-//                   },
-//                   "& .MuiMenuItem-root": {
-//                     color: "white",
-//                   },
-//                   "& .MuiDataGrid-menuItem-root:hover": {
-//                     backgroundColor: "#1565c0",
-//                   },
-//                   "& .MuiDataGrid-sortIcon": {
-//                     opacity: 1,
-//                     color: "white",
-//                   },
-//                   "& .MuiDataGrid-menuIconButton": {
-//                     opacity: 1,
-//                     color: "white",
-//                   },
-//                   "& .MuiDataGrid-filterIcon": {
-//                     opacity: 1,
-//                     color: "white",
-//                   },
-//                 }}
-//               />
-//             </Box>
-
-//             {/* Conditional rendering of Apply/Cancel buttons */}
-//             {console.log("showThebottomButtons", selectedRows.length > 0)}
-//             {selectedRows.length > 0 && (
-//               <Box
-//                 key={uuidv4()}
-//                 sx={{
-//                   display: "flex",
-//                   justifyContent: "start",
-//                   m: 2,
-//                   position: "fixed",
-//                   bottom: 10,
-//                   width: "83%",
-//                   backgroundColor: "#787877",
-//                   gap: 2,
-//                   zIndex: 5,
-//                   p: 0.5,
-//                   mr: "530px",
-//                   borderRadius: "7px", // Set the border radius here
-//                   boxShadow: 3, // Optional: add shadow for better visibility
-//                 }}
-//               >
-//                 <Button
-//                   variant="outlined"
-//                   color="white"
-//                   onClick={handleApplyClick}
-//                   sx={{ maxHeight: 35, mt: 1.2, color: "#ffff", ml: 2 }}
-//                 >
-//                   Apply
-//                 </Button>
-//                 <Button
-//                   variant="outlined"
-//                   color="white"
-//                   sx={{ maxHeight: 35, mt: 1.2, color: "#ffff" }}
-//                   onClick={() => setSelectedRows([])} // Reset selection on cancel
-//                 >
-//                   Cancel
-//                 </Button>
-//                 <Box mb={0.5}>
-//                   <TableDropdown />
-//                 </Box>
-
-//                 <Box display={"flex"} mt={1} mb={1}>
-//                   <Checkbox
-//                     checked={checkedBox}
-//                     onChange={handleSelectAllChange}
-//                     value="checkedBox"
-//                     sx={{
-//                       color: "white", // Set the checkbox color to white
-//                       "&.Mui-checked": {
-//                         color: "white", // Set checked state color to white
-//                       },
-//                     }}
-//                   />
-//                   <Typography variant="h6" color="#ffff" sx={{ mt: 0.7 }}>
-//                     For All
-//                   </Typography>
-//                 </Box>
+//                 <DataGrid
+//                   rows={filteredData}
+//                   columns={columns}
+//                   checkboxSelection
+//                   disableSelectionOnClick={true}
+//                   rowSelectionModel={globalSelectedRows}
+//                   // onRowSelectionModelChange={handleSelection}
+//                   onRowSelectionModelChange={handleSelectionChange}
+//                   pagination
+//                   pageSize={paginationModel.pageSize}
+//                   page={paginationModel.page}
+//                   initialState={{
+//                     pagination: {
+//                       paginationModel: { page: 0, pageSize: 5 },
+//                     },
+//                   }}
+//                   pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
+//                   rowCount={300} // Make sure this reflects the total number of members
+//                   paginationMode="server"
+//                   onPaginationModelChange={handlePaginationChange}
+//                   filterModel={filterModel}
+//                   onFilterModelChange={handleFilterChangeDate}
+//                   sx={{
+//                     height: 600, // Set a fixed height
+//                     width: "100%",
+//                     // overflowY: "auto", // Enable vertical scrolling
+//                     "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root": {
+//                       color: "white",
+//                     },
+//                     "& .MuiDataGrid-columnHeader": {
+//                       backgroundColor: "#787877",
+//                       color: "white",
+//                       maxHeight: 70,
+//                     },
+//                     "& .MuiDataGrid-columnHeaderTitle": {
+//                       color: "white",
+//                     },
+//                     "& .MuiDataGrid-columnMenuIcon": {
+//                       color: "#fffff !important",
+//                     },
+//                     "& .MuiDataGrid-menu": {
+//                       backgroundColor: "#1976d2",
+//                     },
+//                     "& .MuiMenuItem-root": {
+//                       color: "white",
+//                     },
+//                     "& .MuiDataGrid-menuItem-root:hover": {
+//                       backgroundColor: "#1565c0",
+//                     },
+//                     "& .MuiDataGrid-sortIcon": {
+//                       opacity: 1,
+//                       color: "white",
+//                     },
+//                     "& .MuiDataGrid-menuIconButton": {
+//                       opacity: 1,
+//                       color: "white",
+//                     },
+//                     "& .MuiDataGrid-filterIcon": {
+//                       opacity: 1,
+//                       color: "white",
+//                     },
+//                   }}
+//                 />
 //               </Box>
-//             )}
-//           </Card>
+
+//               {showThebottomButtons && (
+//                 <Box
+//                   key={uuidv4()}
+//                   sx={{
+//                     display: "flex",
+//                     justifyContent: "start",
+//                     m: 2,
+//                     position: "fixed",
+//                     bottom: 10,
+//                     width: "83%",
+//                     backgroundColor: "#787877",
+//                     gap: 2,
+//                     zIndex: 5,
+//                     p: 0.5,
+//                     mr: "530px",
+//                     borderRadius: "7px", // Set the border radius here
+//                     boxShadow: 3, // Optional: add shadow for better visibility
+//                   }}
+//                 >
+//                   <Button
+//                     variant="outlined"
+//                     color="white"
+//                     onClick={handleApplyClick}
+//                     sx={{ maxHeight: 35, mt: 1.2, color: "#ffff", ml: 2 }}
+//                   >
+//                     Apply
+//                   </Button>
+//                   <Button
+//                     variant="outlined"
+//                     color="white"
+//                     sx={{ maxHeight: 35, mt: 1.2, color: "#ffff" }}
+//                     onClick={() => setSelectedRows([])} // Reset selection on cancel
+//                   >
+//                     Cancel
+//                   </Button>
+//                   <Box mb={0.5}>
+//                     <TableDropdown />
+//                   </Box>
+
+//                   <Box display={"flex"} mt={1} mb={1}>
+//                     <Checkbox
+//                       checked={checkedBox}
+//                       onChange={handleSelection} // Handle checkbox change
+//                       value="checkedBox"
+//                       sx={{
+//                         color: "white",
+//                         "&.Mui-checked": {
+//                           color: "white",
+//                         },
+//                       }}
+//                     />
+//                     <Typography variant="h6" color="#ffff" sx={{ mt: 0.7 }}>
+//                       For All
+//                     </Typography>
+//                   </Box>
+//                 </Box>
+//               )}
+//             </Card>
+//           </Grid>
 //         </Grid>
-//       </Grid>
 
-//       {/* Drawer Component */}
-//       <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
-//         <Box p={2} width="500px">
-//           <Typography variant="h6" color="textPrimary">
-//             My Filters
-//           </Typography>
+//         {/* Drawer Component */}
+//         <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
+//           <Box p={2} width="500px">
+//             <Typography variant="h6" color="textPrimary">
+//               My Filters
+//             </Typography>
+//             <Box textAlign={"center"}>
+//               <FormControl sx={{ width: "50%" }} margin="normal">
+//                 <InputLabel>Filter Condition</InputLabel>
+//                 <Select
+//                   value={customFilters.filterCondition}
+//                   onChange={(e) => {
+//                     const filterCondition = e.target.value;
+//                     setCustomFilters((prev) => ({
+//                       ...prev,
+//                       filterCondition,
+//                     }));
+//                   }}
+//                 >
+//                   <MenuItem value="all">All (AND)</MenuItem>
+//                   <MenuItem value="any">Any (OR)</MenuItem>
+//                 </Select>
+//               </FormControl>
+//             </Box>
+//             <TextField
+//               label="Member"
+//               fullWidth
+//               name="member"
+//               value={customFilters.member}
+//               onChange={(e) =>
+//                 setCustomFilters((prev) => ({
+//                   ...prev,
+//                   member: e.target.value,
+//                 }))
+//               }
+//               margin="normal"
+//             />
+//             <Box mt={2}>
+//               <Grid container spacing={2}>
+//                 <Grid item xs={6}>
+//                   <FormControl fullWidth sx={{ mt: 2 }}>
+//                     <InputLabel>Age Condition</InputLabel>
+//                     <Select
+//                       value={customFilters.ageCondition}
+//                       onChange={(e) =>
+//                         setCustomFilters((prev) => ({
+//                           ...prev,
+//                           ageCondition: e.target.value,
+//                         }))
+//                       }
+//                     >
+//                       <MenuItem value="=">=</MenuItem>
+//                       <MenuItem value="!=">!=</MenuItem>
+//                       <MenuItem value="<">&lt;</MenuItem>
+//                       <MenuItem value=">">&gt;</MenuItem>
+//                       <MenuItem value="<=">&lt;=</MenuItem>
+//                       <MenuItem value=">=">&gt;=</MenuItem>
+//                     </Select>
+//                   </FormControl>
+//                 </Grid>
 
-//           <FormControl fullWidth margin="normal" sx={{ alignItems: "center" }}>
-//             <Select
-//               sx={{ width: "20%" }}
-//               value={filterOption}
-//               onChange={handleOptionChange}
-//               label="Filter Condition"
+//                 <Grid item xs={6}>
+//                   <TextField
+//                     label="Age"
+//                     fullWidth
+//                     name="age"
+//                     value={customFilters.age}
+//                     onChange={(e) =>
+//                       setCustomFilters((prev) => ({
+//                         ...prev,
+//                         age: e.target.value,
+//                       }))
+//                     }
+//                     margin="normal"
+//                   />
+//                 </Grid>
+//               </Grid>
+//             </Box>
+//           </Box>
+
+//           <Box m={2}>
+//             <Button
+//               variant="outlined"
+//               color="primary"
+//               onClick={() =>
+//                 setCustomFilters({
+//                   member: "",
+//                   age: "",
+//                   filterCondition: "all",
+//                 })
+//               }
 //             >
-//               <MenuItem value="all">All</MenuItem>
-//               <MenuItem value="any">Any</MenuItem>
-//             </Select>
-//           </FormControl>
-
-//           <TextField
-//             label="Filter 1"
-//             fullWidth
-//             name="filter1"
-//             value={dummyFilters.filter1}
-//             onChange={handleFilterChange}
-//             margin="normal"
-//           />
-
-//           <Typography variant="body1" align="center" sx={{ mt: 2, mb: 2 }}>
-//             {filterOption === "all" ? "AND" : "OR"}
-//           </Typography>
-
-//           <TextField
-//             label="Filter 2"
-//             fullWidth
-//             name="filter2"
-//             value={dummyFilters.filter2}
-//             onChange={handleFilterChange}
-//             margin="normal"
-//           />
-//         </Box>
-//         <Box m={2}>
-//           <Button variant="outlined" color="#787879" disabled>
-//             + Add Filter
-//           </Button>
-//         </Box>
-//         <Box m={2}>
-//           <DateRangeFilter filter={filter} setFilter={setFilter} />
-//         </Box>
-//       </Drawer>
-//     </Box>
+//               Reset Filters
+//             </Button>
+//           </Box>
+//           <Box m={2}>
+//             <Typography m={2}>Date Filters</Typography>
+//             <DateRangeFilter filter={filter} setFilter={setFilter} />
+//           </Box>
+//         </Drawer>
+//       </Box>
+//     </LocalizationProvider>
 //   );
 // };
 
 // export default MembersTable;
+
+
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import {
+  Typography,
+  Box,
+  Grid,
+  Card,
+  IconButton,
+} from "@mui/material";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
+import { DataGrid } from "@mui/x-data-grid";
+
+const DummyTable = () => {
+  const [data, setData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [columns, setColumns] = useState([
+    { field: "id", headerName: "ID", width: 70 },
+    { field: "member", headerName: "Member", width: 150 },
+    { field: "createdAt", headerName: "Created At", width: 180 },
+    { field: "age", headerName: "Age", width: 90 },
+    { field: "education", headerName: "Education", width: 130 },
+    { field: "city", headerName: "City", width: 100 },
+    {
+      field: "action",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+        <Box>
+          <IconButton
+            component={Link}
+            to={`/table/edit/member/${params.row.id}`}
+            color="primary"
+            sx={{ mr: 1 }}
+          >
+            <Edit />
+          </IconButton>
+          <IconButton color="error" onClick={() => deleteHandle(params.row.id)}>
+            <Delete />
+          </IconButton>
+          <IconButton
+            component={Link}
+            to={`/table/view/member/${params.row.id}`}
+            color="success"
+            sx={{ mr: 1 }}
+          >
+            <Visibility />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ]);
+
+  const [filter] = useState({ fromDate: "", toDate: "" });
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get("http://localhost:7779/members");
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      }
+    };
+
+    fetchMembers();
+  }, []);
+
+  const filteredData = data.filter((row) => {
+    const { fromDate, toDate } = filter;
+    const createdAtDate = new Date(row.createdAt);
+    const normalizeDate = (date) => {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    };
+
+    if (fromDate && toDate) {
+      return (
+        createdAtDate >= normalizeDate(fromDate) &&
+        createdAtDate <= normalizeDate(toDate)
+      );
+    }
+
+    if (fromDate) {
+      return createdAtDate >= normalizeDate(fromDate);
+    }
+
+    if (toDate) {
+      return createdAtDate <= normalizeDate(toDate);
+    }
+
+    return true;
+  });
+
+  const deleteHandle = (id) => {
+    if (window.confirm("Would you like to delete this row?")) {
+      axios.delete(`http://localhost:7779/members/${id}`).then(() => {
+        setData((prevData) => prevData.filter((member) => member.id !== id));
+      });
+    }
+  };
+
+  // Handle column order change
+  const handleColumnOrderChange = (newOrder) => {
+    // Update column state when user drags columns to reorder
+    setColumns(newOrder);
+    // Optionally, save the new order to localStorage or a server here
+    localStorage.setItem("columnOrder", JSON.stringify(newOrder));
+  };
+
+  // Optional: load column order from localStorage
+  useEffect(() => {
+    const storedColumnOrder = JSON.parse(localStorage.getItem("columnOrder"));
+    if (storedColumnOrder) {
+      setColumns(storedColumnOrder);
+    }
+  }, []);
+
+  return (
+    <Box pb={2}>
+      <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <Card sx={{ height: "100%" }}>
+            <Box
+              mx={2}
+              mt={2}
+              py={1}
+              px={2}
+              bgcolor="info.main"
+              borderRadius="lg"
+            >
+              <Typography
+                variant="h5"
+                color="#787879"
+                align="left"
+                fontFamily={"serif"}
+              >
+                Members Table
+              </Typography>
+            </Box>
+            <Box p={2}>
+              <DataGrid
+                rows={filteredData}
+                columns={columns}
+                checkboxSelection
+                onRowSelectionModelChange={setSelectedRows}
+                pagination
+                pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 25 } },
+                }}
+                autoHeight
+                columnBuffer={10}
+                onColumnOrderChange={handleColumnOrderChange} // Handle column reorder
+                sx={{
+                  "& .MuiDataGrid-columnHeader": {
+                    backgroundColor: "#787877",
+                    color: "white",
+                  },
+                }}
+              />
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default DummyTable;
+
