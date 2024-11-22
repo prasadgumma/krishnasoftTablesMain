@@ -2052,6 +2052,7 @@ import {
   Grid,
   Card,
   IconButton,
+  TextField,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -2097,20 +2098,34 @@ const DummyTable = () => {
   ]);
 
   const [filter] = useState({ fromDate: "", toDate: "" });
+  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+
+  // Fetch data based on search query
+  const fetchMembers = async () => {
+    try {
+      const response = await axios.get("http://localhost:7779/members", {
+        params: {
+          search: searchQuery, // Send searchQuery as a query parameter
+        },
+      });
+      setData(response.data);
+    } catch (error) {
+      console.error("Error fetching members:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const response = await axios.get("http://localhost:7779/members");
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching members:", error);
-      }
-    };
-
-    fetchMembers();
+    fetchMembers(); // Fetch members initially when the component mounts
   }, []);
 
+  // Update API data on search query change
+  useEffect(() => {
+    if (searchQuery !== "") {
+      fetchMembers(); // Fetch new data on search query change
+    }
+  }, [searchQuery]);
+
+  // Filter the data by date range (if any)
   const filteredData = data.filter((row) => {
     const { fromDate, toDate } = filter;
     const createdAtDate = new Date(row.createdAt);
@@ -2148,13 +2163,10 @@ const DummyTable = () => {
 
   // Handle column order change
   const handleColumnOrderChange = (newOrder) => {
-    // Update column state when user drags columns to reorder
     setColumns(newOrder);
-    // Optionally, save the new order to localStorage or a server here
     localStorage.setItem("columnOrder", JSON.stringify(newOrder));
   };
 
-  // Optional: load column order from localStorage
   useEffect(() => {
     const storedColumnOrder = JSON.parse(localStorage.getItem("columnOrder"));
     if (storedColumnOrder) {
@@ -2185,6 +2197,15 @@ const DummyTable = () => {
               </Typography>
             </Box>
             <Box p={2}>
+              {/* Add Search Input */}
+              <TextField
+                label="Search"
+                variant="outlined"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+                sx={{ width: "300px", marginBottom: "20px" }}
+              />
+
               <DataGrid
                 rows={filteredData}
                 columns={columns}
@@ -2197,7 +2218,7 @@ const DummyTable = () => {
                 }}
                 autoHeight
                 columnBuffer={10}
-                onColumnOrderChange={handleColumnOrderChange} // Handle column reorder
+                onColumnOrderChange={handleColumnOrderChange}
                 sx={{
                   "& .MuiDataGrid-columnHeader": {
                     backgroundColor: "#787877",

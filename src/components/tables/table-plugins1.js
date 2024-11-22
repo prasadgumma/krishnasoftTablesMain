@@ -534,7 +534,7 @@ const MembersTable = () => {
                   width: "83%",
                   backgroundColor: "#787877",
                   gap: 2,
-                  zIndex: 5,
+                  zIndex: 100,
                   p: 0.5,
                   mr: "530px",
                   borderRadius: "7px", // Set the border radius here
