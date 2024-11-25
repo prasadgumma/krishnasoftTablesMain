@@ -46,6 +46,7 @@ const MembersTable = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
+  const [loading, setLoading] = useState(false);
   console.log(globalSelectedRows);
 
   const [selectedColumns] = useState({
@@ -68,19 +69,20 @@ const MembersTable = () => {
     const fetchMembers = async () => {
       try {
         const { page, pageSize } = paginationModel;
-        const start = page * pageSize;
-        const end = (page + 1) * pageSize;
+        const start = page * 25;
+        const end = (page + 1) * 25;
+
         // Make the API call with pagination parameters
         const response = await axios.get("http://localhost:7779/members", {
           params: {
             _page: page + 1, // Assuming your API expects 1-based page index
-            _limit: pageSize,
+            _limit: 25,
             _start: start,
             _end: end,
             _search: searchQuery,
           },
         });
-
+        console.log(response, "Res");
         const dataWithCreatedAt = response.data.map((member) => {
           // Use localStorage or state to persist createdAt
           const existingCreatedAt =
@@ -331,27 +333,34 @@ const MembersTable = () => {
   };
 
   const handleSelectionChange = (newSelection) => {
-    // Update selected rows for the current page
-    setGlobalSelectedRows(newSelection);
+    console.log(newSelection, "NewSl");
+    // Get the rows visible on the current page
+    const visibleRows = data.slice(0, paginationModel.pageSize);
+    console.log(paginationModel, "Pmodel");
+    // Map visible rows to their IDs
+    const visibleRowIds = visibleRows.map((row) => row.id);
 
-    // Determine if "Select All" should be checked (select all rows on the current page)
-    const allIds = filteredData.map((row) => row.id);
-    setCheckedBox(newSelection.length === allIds.length);
+    // Filter the selected IDs to include only those in visible rows
+    const updatedSelection = newSelection.filter((id) =>
+      visibleRowIds.includes(id)
+    );
 
-    // Update global selection (combine with previous selection)
-    setGlobalSelectedRows((prev) => {
-      const updatedGlobalSelection = Array.from(
-        new Set([...prev, ...newSelection])
-      );
-      return updatedGlobalSelection;
-    });
+    // Update the global selection with visible rows only
+    setGlobalSelectedRows(updatedSelection);
+    if (visibleRowIds === 25) {
+      setCheckedBox(true);
+    } else {
+      setCheckedBox(false);
+    }
+
+    console.log(checkedBox);
   };
 
   const handleSelection = (eventOrIds) => {
     if (typeof eventOrIds === "object" && eventOrIds.target) {
       // Handle "Select All" checkbox change
       const { checked } = eventOrIds.target;
-
+      console.log(checked, "check");
       const allIds = filteredData.map((row) => row.id);
       if (checked) {
         console.log(allIds, "allids");
@@ -361,18 +370,23 @@ const MembersTable = () => {
         );
         setGlobalSelectedRows(allIds); // Select all rows on the current page
         setCheckedBox(checked);
+        // alert(`Selected all ${allIds.length} rows.`);
+        alert(
+          `Action will be applied to all items selected by the filter  ${allIds.length} rows.`
+        );
       } else {
         // Deselect all rows
         setGlobalSelectedRows(
           (prev) => prev.filter((id) => !allIds.includes(id)) // Remove filtered rows from global selection
         );
         setCheckedBox((prev) => !prev); // Reset local selection for the current page
+        alert("Deselected all rows.");
       }
     }
   };
 
   const showThebottomButtons = globalSelectedRows.length > 0;
-
+  console.log(data, "Data");
   return (
     <Box pb={2}>
       <Grid container spacing={6}>
@@ -473,10 +487,11 @@ const MembersTable = () => {
                 }}
                 pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
                 rowCount={300} // Make sure this reflects the total number of members
-                paginationMode="server"
                 onPaginationModelChange={handlePaginationChange}
                 filterModel={filterModel}
                 onFilterModelChange={handleFilterChangeDate}
+                paginationMode="client" // Client-side pagination
+                loading={loading}
                 sx={{
                   height: 600, // Set a fixed height
                   width: "100%",
@@ -518,6 +533,29 @@ const MembersTable = () => {
                   },
                 }}
               />
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: 2,
+                  backgroundColor: "#ffff",
+                  borderTop: "1px solid #ccc",
+                }}
+              >
+                <span>
+                  Selected Rows:{" "}
+                  <strong>
+                    {globalSelectedRows.length === filteredData.length
+                      ? "SelectedAll"
+                      : globalSelectedRows.length}
+                  </strong>
+                </span>
+                <span>
+                  Total Rows: <strong>{filteredData.length}</strong>
+                </span>
+              </Box>
             </Box>
 
             {/* Conditional rendering of Apply/Cancel buttons */}
@@ -539,6 +577,7 @@ const MembersTable = () => {
                   mr: "530px",
                   borderRadius: "7px", // Set the border radius here
                   boxShadow: 3, // Optional: add shadow for better visibility
+                  mb: 15,
                 }}
               >
                 <Button

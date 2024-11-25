@@ -7,8 +7,8 @@ const Menu = [
     children: [
       { path: "/table/elements", title: "Table Elements" },
       { path: "/table/plugins", title: "Table Plugins" },
-      { path: "/table/plugins1", title: "Table Plugins1" },
-      { path: "/table/foldersview", title: "Folders View" },
+      { path: "/table/plugins1", title: "Table View1" },
+      { path: "/table/foldersview", title: "Table View2" },
       { path: "/table/dummyTable", title: "Dummy Table" }
 
     ],

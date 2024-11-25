@@ -2041,198 +2041,281 @@
 
 // export default MembersTable;
 
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import { Link } from "react-router-dom";
+// import {
+//   Typography,
+//   Box,
+//   Grid,
+//   Card,
+//   IconButton,
+//   TextField,
+// } from "@mui/material";
+// import { Edit, Delete, Visibility } from "@mui/icons-material";
+// import { DataGrid } from "@mui/x-data-grid";
 
+// const DummyTable = () => {
+//   const [data, setData] = useState([]);
+//   const [selectedRows, setSelectedRows] = useState([]);
+//   const [columns, setColumns] = useState([
+//     { field: "id", headerName: "ID", width: 70 },
+//     { field: "member", headerName: "Member", width: 150 },
+//     { field: "createdAt", headerName: "Created At", width: 180 },
+//     { field: "age", headerName: "Age", width: 90 },
+//     { field: "education", headerName: "Education", width: 130 },
+//     { field: "city", headerName: "City", width: 100 },
+//     {
+//       field: "action",
+//       headerName: "Actions",
+//       width: 150,
+//       renderCell: (params) => (
+//         <Box>
+//           <IconButton
+//             component={Link}
+//             to={`/table/edit/member/${params.row.id}`}
+//             color="primary"
+//             sx={{ mr: 1 }}
+//           >
+//             <Edit />
+//           </IconButton>
+//           <IconButton color="error" onClick={() => deleteHandle(params.row.id)}>
+//             <Delete />
+//           </IconButton>
+//           <IconButton
+//             component={Link}
+//             to={`/table/view/member/${params.row.id}`}
+//             color="success"
+//             sx={{ mr: 1 }}
+//           >
+//             <Visibility />
+//           </IconButton>
+//         </Box>
+//       ),
+//     },
+//   ]);
+
+//   const [filter] = useState({ fromDate: "", toDate: "" });
+//   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+
+//   // Fetch data based on search query
+//   const fetchMembers = async () => {
+//     try {
+//       const response = await axios.get("http://localhost:7779/members", {
+//         params: {
+//           search: searchQuery, // Send searchQuery as a query parameter
+//         },
+//       });
+//       setData(response.data);
+//     } catch (error) {
+//       console.error("Error fetching members:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchMembers(); // Fetch members initially when the component mounts
+//   }, []);
+
+//   // Update API data on search query change
+//   useEffect(() => {
+//     if (searchQuery !== "") {
+//       fetchMembers(); // Fetch new data on search query change
+//     }
+//   }, [searchQuery]);
+
+//   // Filter the data by date range (if any)
+//   const filteredData = data.filter((row) => {
+//     const { fromDate, toDate } = filter;
+//     const createdAtDate = new Date(row.createdAt);
+//     const normalizeDate = (date) => {
+//       const d = new Date(date);
+//       d.setHours(0, 0, 0, 0);
+//       return d;
+//     };
+
+//     if (fromDate && toDate) {
+//       return (
+//         createdAtDate >= normalizeDate(fromDate) &&
+//         createdAtDate <= normalizeDate(toDate)
+//       );
+//     }
+
+//     if (fromDate) {
+//       return createdAtDate >= normalizeDate(fromDate);
+//     }
+
+//     if (toDate) {
+//       return createdAtDate <= normalizeDate(toDate);
+//     }
+
+//     return true;
+//   });
+
+//   const deleteHandle = (id) => {
+//     if (window.confirm("Would you like to delete this row?")) {
+//       axios.delete(`http://localhost:7779/members/${id}`).then(() => {
+//         setData((prevData) => prevData.filter((member) => member.id !== id));
+//       });
+//     }
+//   };
+
+//   // Handle column order change
+//   const handleColumnOrderChange = (newOrder) => {
+//     setColumns(newOrder);
+//     localStorage.setItem("columnOrder", JSON.stringify(newOrder));
+//   };
+
+//   useEffect(() => {
+//     const storedColumnOrder = JSON.parse(localStorage.getItem("columnOrder"));
+//     if (storedColumnOrder) {
+//       setColumns(storedColumnOrder);
+//     }
+//   }, []);
+
+//   return (
+//     <Box pb={2}>
+//       <Grid container spacing={6}>
+//         <Grid item xs={12}>
+//           <Card sx={{ height: "100%" }}>
+//             <Box
+//               mx={2}
+//               mt={2}
+//               py={1}
+//               px={2}
+//               bgcolor="info.main"
+//               borderRadius="lg"
+//             >
+//               <Typography
+//                 variant="h5"
+//                 color="#787879"
+//                 align="left"
+//                 fontFamily={"serif"}
+//               >
+//                 Members Table
+//               </Typography>
+//             </Box>
+//             <Box p={2}>
+//               {/* Add Search Input */}
+//               <TextField
+//                 label="Search"
+//                 variant="outlined"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+//                 sx={{ width: "300px", marginBottom: "20px" }}
+//               />
+
+//               <DataGrid
+//                 rows={filteredData}
+//                 columns={columns}
+//                 checkboxSelection
+//                 onRowSelectionModelChange={setSelectedRows}
+//                 pagination
+//                 pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
+//                 initialState={{
+//                   pagination: { paginationModel: { pageSize: 25 } },
+//                 }}
+//                 autoHeight
+//                 columnBuffer={10}
+//                 onColumnOrderChange={handleColumnOrderChange}
+//                 sx={{
+//                   "& .MuiDataGrid-columnHeader": {
+//                     backgroundColor: "#787877",
+//                     color: "white",
+//                   },
+//                 }}
+//               />
+//             </Box>
+//           </Card>
+//         </Grid>
+//       </Grid>
+//     </Box>
+//   );
+// };
+
+// export default DummyTable;
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import {
-  Typography,
-  Box,
-  Grid,
-  Card,
-  IconButton,
-  TextField,
-} from "@mui/material";
-import { Edit, Delete, Visibility } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
+import { Box } from "@mui/material";
 
-const DummyTable = () => {
+function PaginatedTable() {
   const [data, setData] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [columns, setColumns] = useState([
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "member", headerName: "Member", width: 150 },
-    { field: "createdAt", headerName: "Created At", width: 180 },
-    { field: "age", headerName: "Age", width: 90 },
-    { field: "education", headerName: "Education", width: 130 },
-    { field: "city", headerName: "City", width: 100 },
-    {
-      field: "action",
-      headerName: "Actions",
-      width: 150,
-      renderCell: (params) => (
-        <Box>
-          <IconButton
-            component={Link}
-            to={`/table/edit/member/${params.row.id}`}
-            color="primary"
-            sx={{ mr: 1 }}
-          >
-            <Edit />
-          </IconButton>
-          <IconButton color="error" onClick={() => deleteHandle(params.row.id)}>
-            <Delete />
-          </IconButton>
-          <IconButton
-            component={Link}
-            to={`/table/view/member/${params.row.id}`}
-            color="success"
-            sx={{ mr: 1 }}
-          >
-            <Visibility />
-          </IconButton>
-        </Box>
-      ),
-    },
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 25,
+  });
+  const [rowCount, setRowCount] = useState(0); // Total rows from server
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [filter] = useState({ fromDate: "", toDate: "" });
-  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
-
-  // Fetch data based on search query
-  const fetchMembers = async () => {
-    try {
-      const response = await axios.get("http://localhost:7779/members", {
-        params: {
-          search: searchQuery, // Send searchQuery as a query parameter
-        },
-      });
-      setData(response.data);
-    } catch (error) {
-      console.error("Error fetching members:", error);
-    }
-  };
-
+  // Fetch Data from API
   useEffect(() => {
-    fetchMembers(); // Fetch members initially when the component mounts
-  }, []);
+    const fetchMembers = async () => {
+      setLoading(true);
+      try {
+        const { page, pageSize } = paginationModel;
 
-  // Update API data on search query change
-  useEffect(() => {
-    if (searchQuery !== "") {
-      fetchMembers(); // Fetch new data on search query change
-    }
-  }, [searchQuery]);
+        // Calculate start and end indexes (if needed by the server)
+        const start = page * pageSize;
+        const end = start + pageSize;
 
-  // Filter the data by date range (if any)
-  const filteredData = data.filter((row) => {
-    const { fromDate, toDate } = filter;
-    const createdAtDate = new Date(row.createdAt);
-    const normalizeDate = (date) => {
-      const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
-      return d;
+        // Make the API call with pagination parameters
+        const response = await axios.get("http://localhost:7779/members", {
+          params: {
+            _page: page + 1, // Assuming 1-based index
+            _limit: pageSize,
+            _start: start,
+            _end: end,
+            _search: searchQuery, // Search query
+          },
+        });
+
+        // Update state with the response data
+        const fetchedData = response.data;
+        setData(fetchedData);
+        setRowCount(parseInt(response.headers["x-total-count"], 10) || 0); // Total records
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (fromDate && toDate) {
-      return (
-        createdAtDate >= normalizeDate(fromDate) &&
-        createdAtDate <= normalizeDate(toDate)
-      );
-    }
+    fetchMembers();
+  }, [paginationModel, searchQuery]); // Re-fetch data on pagination or search query change
 
-    if (fromDate) {
-      return createdAtDate >= normalizeDate(fromDate);
-    }
-
-    if (toDate) {
-      return createdAtDate <= normalizeDate(toDate);
-    }
-
-    return true;
-  });
-
-  const deleteHandle = (id) => {
-    if (window.confirm("Would you like to delete this row?")) {
-      axios.delete(`http://localhost:7779/members/${id}`).then(() => {
-        setData((prevData) => prevData.filter((member) => member.id !== id));
-      });
-    }
-  };
-
-  // Handle column order change
-  const handleColumnOrderChange = (newOrder) => {
-    setColumns(newOrder);
-    localStorage.setItem("columnOrder", JSON.stringify(newOrder));
-  };
-
-  useEffect(() => {
-    const storedColumnOrder = JSON.parse(localStorage.getItem("columnOrder"));
-    if (storedColumnOrder) {
-      setColumns(storedColumnOrder);
-    }
-  }, []);
+  // Columns Configuration
+  const columns = [
+    { field: "id", headerName: "ID", width: 100 },
+    { field: "name", headerName: "Name", width: 200 },
+    { field: "email", headerName: "Email", width: 250 },
+    { field: "createdAt", headerName: "Created At", width: 200 },
+  ];
 
   return (
-    <Box pb={2}>
-      <Grid container spacing={6}>
-        <Grid item xs={12}>
-          <Card sx={{ height: "100%" }}>
-            <Box
-              mx={2}
-              mt={2}
-              py={1}
-              px={2}
-              bgcolor="info.main"
-              borderRadius="lg"
-            >
-              <Typography
-                variant="h5"
-                color="#787879"
-                align="left"
-                fontFamily={"serif"}
-              >
-                Members Table
-              </Typography>
-            </Box>
-            <Box p={2}>
-              {/* Add Search Input */}
-              <TextField
-                label="Search"
-                variant="outlined"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
-                sx={{ width: "300px", marginBottom: "20px" }}
-              />
-
-              <DataGrid
-                rows={filteredData}
-                columns={columns}
-                checkboxSelection
-                onRowSelectionModelChange={setSelectedRows}
-                pagination
-                pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
-                initialState={{
-                  pagination: { paginationModel: { pageSize: 25 } },
-                }}
-                autoHeight
-                columnBuffer={10}
-                onColumnOrderChange={handleColumnOrderChange}
-                sx={{
-                  "& .MuiDataGrid-columnHeader": {
-                    backgroundColor: "#787877",
-                    color: "white",
-                  },
-                }}
-              />
-            </Box>
-          </Card>
-        </Grid>
-      </Grid>
+    <Box sx={{ height: 600, width: "100%" }}>
+      <DataGrid
+        rows={data}
+        columns={columns}
+        pagination
+        pageSizeOptions={[5, 10, 25, 50]} // Page size options
+        rowCount={rowCount}
+        paginationMode="server" // Server-side pagination
+        onPaginationModelChange={setPaginationModel} // Update pagination state
+        paginationModel={paginationModel}
+        loading={loading}
+        checkboxSelection
+        disableSelectionOnClick
+        sx={{
+          "& .MuiDataGrid-columnHeader": {
+            backgroundColor: "#787877",
+            color: "white",
+          },
+        }}
+      />
     </Box>
   );
-};
+}
 
-export default DummyTable;
-
+export default PaginatedTable;

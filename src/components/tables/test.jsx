@@ -1253,7 +1253,7 @@ import MenuIcon from "@mui/icons-material/Menu"; // For mobile drawer
 import MembersTable from "./table-plugins1"; // Assuming this is your existing MembersTable component
 
 function ContactsListWithFolders() {
-  const [folders, setFolders] = useState(["My First Folder", "Folder 1"]);
+  const [folders, setFolders] = useState(['My First Folder']);
   const [open, setOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -1371,10 +1371,14 @@ function ContactsListWithFolders() {
         {/* Main Grid Layout */}
         <Grid container spacing={2}>
           {/* Folders on the Left (on larger screens) */}
-          <Grid item xs={12} md={3} sx={{ display: { xs: "none", md: "block" } }}>
+          <Grid item xs={12} md={2.6} sx={{ display: { xs: "none", md: "block" } }}>
             <Box borderRight="1px solid #ddd" p={2}>
+            <Typography variant="h6" m={1} ml={2}>
+                 List of Tables
+                </Typography>
               {/* Search and New Folder button inside Left Sidebar */}
-              <Box display="flex" alignItems="center" mb={2}>
+              <Box display="flex" alignItems="center" mb={2} mt={1.5}>
+             
                 <SearchIcon />
                 <TextField
                   placeholder="Search"
@@ -1390,11 +1394,11 @@ function ContactsListWithFolders() {
                 color="primary"
                 startIcon={<AddIcon />}
                 onClick={handleOpen}
-                sx={{ mb: 2, width: "100%" }}
+                sx={{ mb: 1.5,mt:2, width: "100%" }}
               >
                 New Folder
               </Button>
-
+<hr ></hr>
               <List>
                 {filteredFolders.map((folder, index) => (
                   <ListItem
@@ -1403,7 +1407,7 @@ function ContactsListWithFolders() {
                     onClick={() => handleFolderClick(folder)}
                   >
                     <ListItemIcon>
-                      {index === 0 ? <ShieldIcon /> : <FolderIcon />}
+                      {index === 0 ? <FolderIcon /> : <FolderIcon />}
                     </ListItemIcon>
                     <ListItemText primary={folder} />
                   </ListItem>
@@ -1413,12 +1417,12 @@ function ContactsListWithFolders() {
           </Grid>
 
           {/* Table on the Right */}
-          <Grid item xs={12} md={9}>
+          <Grid item xs={12} md={9.4}>
             {selectedFolder && (
               <Box>
-                {/* <Typography variant="h6" mb={2}>
+                <Typography variant="h6" m={0.5} ml={4}>
                   {selectedFolder}
-                </Typography> */}
+                </Typography>
                 <MembersTable />
               </Box>
             )}
