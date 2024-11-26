@@ -69,8 +69,8 @@ const MembersTable = () => {
     const fetchMembers = async () => {
       try {
         const { page, pageSize } = paginationModel;
-        const start = page * 25;
-        const end = (page + 1) * 25;
+        const start = page * pageSize;
+        const end = (page + 1) * pageSize;
 
         // Make the API call with pagination parameters
         const response = await axios.get("http://localhost:7779/members", {
@@ -333,10 +333,8 @@ const MembersTable = () => {
   };
 
   const handleSelectionChange = (newSelection) => {
-    console.log(newSelection, "NewSl");
     // Get the rows visible on the current page
     const visibleRows = data.slice(0, paginationModel.pageSize);
-    console.log(paginationModel, "Pmodel");
     // Map visible rows to their IDs
     const visibleRowIds = visibleRows.map((row) => row.id);
 
@@ -490,7 +488,7 @@ const MembersTable = () => {
                 onPaginationModelChange={handlePaginationChange}
                 filterModel={filterModel}
                 onFilterModelChange={handleFilterChangeDate}
-                paginationMode="client" // Client-side pagination
+                paginationMode="server" // Client-side pagination
                 loading={loading}
                 sx={{
                   height: 600, // Set a fixed height
