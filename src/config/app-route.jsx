@@ -7,7 +7,7 @@ import TableElements from "../components/tables/table-elements.js";
 import TablePlugins from "../components/tables/table-plugins.js";
 import { Outlet } from "react-router-dom";
 import MembersTable from "../components/tables/table-plugins1.js";
-import ContactsListWithFolders from "../components/tables/test.jsx";
+import ContactsListWithFolders from "../components/tables/test.js";
 import AddMember from "../components/tables/add-member.js";
 import EditMember from "../components/tables/edit-member.js";
 import ViewMember from "../components/tables/view-member.js";

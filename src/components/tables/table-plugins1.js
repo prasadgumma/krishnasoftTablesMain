@@ -22,6 +22,11 @@ import { DataGrid } from "@mui/x-data-grid";
 import DateRangeFilter from "./date-range-filter";
 import CreatedAtColumn from "./created-at-table";
 import { v4 as uuidv4 } from "uuid";
+import DateFilterPopover from "./date-filter";
+import dayjs from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import ProfessionFilterComponent from "./proffession-filter";
+import CityFilterComponent from "./city-filter";
 
 const MembersTable = () => {
   const [data, setData] = useState([]);
@@ -41,13 +46,15 @@ const MembersTable = () => {
   const [customFilters, setCustomFilters] = useState({
     member: "",
     age: "",
-    ageCondition: "=", // Default condition
+    ageCondition: "", // Default condition
     filterCondition: "all", // 'all' for AND, 'any' for OR
   });
+  const [allFilterData, setAllFilterData] = useState();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
   const [loading, setLoading] = useState(false);
-  console.log(globalSelectedRows);
+
 
   const [selectedColumns] = useState({
     id: true,
@@ -63,116 +70,6 @@ const MembersTable = () => {
     description: false,
     status: true,
     action: true,
-  });
-
-  useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const { page, pageSize } = paginationModel;
-        const start = page * pageSize;
-        const end = (page + 1) * pageSize;
-
-        // Make the API call with pagination parameters
-        const response = await axios.get("http://localhost:7779/members", {
-          params: {
-            _page: page + 1, // Assuming your API expects 1-based page index
-            _limit: 25,
-            _start: start,
-            _end: end,
-            _search: searchQuery,
-          },
-        });
-        console.log(response, "Res");
-        const dataWithCreatedAt = response.data.map((member) => {
-          // Use localStorage or state to persist createdAt
-          const existingCreatedAt =
-            member.createdAt || localStorage.getItem(`createdAt_${member.id}`);
-          const createdAt = existingCreatedAt || new Date().toISOString();
-
-          // Store the createdAt value in localStorage (or any persistent storage)
-          if (!existingCreatedAt) {
-            localStorage.setItem(`createdAt_${member.id}`, createdAt);
-          }
-
-          return { ...member, createdAt };
-        });
-
-        setData(dataWithCreatedAt);
-      } catch (error) {
-        console.error("Error fetching members:", error);
-      }
-    };
-
-    fetchMembers();
-  }, [paginationModel, searchQuery]); // Dependency array ensures the effect is run whenever paginationModel changes
-
-  const filteredData = data.filter((row) => {
-    const { fromDate, toDate } = filter;
-    const { member, age, ageCondition, filterCondition } = customFilters;
-
-    // Normalize createdAt for date filters
-    const createdAtDate = new Date(row.createdAt);
-
-    const normalizeDate = (date) => {
-      const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    };
-
-    // Check date range
-    let passesDateFilter = true;
-    if (fromDate && toDate) {
-      const startDate = normalizeDate(fromDate);
-      const endDate = normalizeDate(toDate);
-      passesDateFilter = createdAtDate >= startDate && createdAtDate <= endDate;
-    } else if (fromDate) {
-      const startDate = normalizeDate(fromDate);
-      passesDateFilter = createdAtDate >= startDate;
-    } else if (toDate) {
-      const endDate = normalizeDate(toDate);
-      passesDateFilter = createdAtDate <= endDate;
-    }
-
-    // Check member filter
-    const matchesMember = member
-      ? row.member.toLowerCase().includes(member.toLowerCase())
-      : true;
-
-    // Apply age condition
-    const ageValue = parseInt(age, 10);
-    let matchesAge = true;
-    if (age && !isNaN(ageValue)) {
-      switch (ageCondition) {
-        case "<":
-          matchesAge = row.age < ageValue;
-          break;
-        case ">":
-          matchesAge = row.age > ageValue;
-          break;
-        case "<=":
-          matchesAge = row.age <= ageValue;
-          break;
-        case ">=":
-          matchesAge = row.age >= ageValue;
-          break;
-        case "=":
-          matchesAge = row.age === ageValue;
-          break;
-        case "!=":
-          matchesAge = row.age !== ageValue;
-          break;
-        default:
-          matchesAge = true; // Default to match all if no condition selected
-      }
-    }
-
-    // Apply AND or OR logic based on filterCondition
-    const passesCustomFilter =
-      filterCondition === "all"
-        ? matchesMember && matchesAge // AND condition
-        : matchesMember || matchesAge; // OR condition
-
-    return passesDateFilter && passesCustomFilter;
   });
 
   const columns = [
@@ -273,6 +170,144 @@ const MembersTable = () => {
     },
   ];
 
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const { page, pageSize } = paginationModel;
+        const start = page * pageSize;
+        const end = (page + 1) * pageSize;
+
+        // Make the API call with pagination parameters
+        const response = await axios.get("http://localhost:7779/members", {
+          params: {
+            _page: page + 1, // Assuming your API expects 1-based page index
+            _limit: 25,
+            _start: start,
+            _end: end,
+            _search: searchQuery,
+          },
+        });
+        console.log(response, "Res");
+        const overAllData = response.data.map((member) => {
+          // Use localStorage or state to persist createdAt
+          const existingCreatedAt =
+            member.createdAt || localStorage.getItem(`createdAt_${member.id}`);
+          const createdAt = existingCreatedAt || new Date().toISOString();
+
+          // Store the createdAt value in localStorage (or any persistent storage)
+          if (!existingCreatedAt) {
+            localStorage.setItem(`createdAt_${member.id}`, createdAt);
+          }
+
+          return { ...member, createdAt };
+        });
+
+        setData(overAllData);
+        setAllFilterData(overAllData);
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      }
+    };
+
+    fetchMembers();
+  }, [paginationModel, searchQuery]); // Dependency array ensures the effect is run whenever paginationModel changes
+
+  const filteredData = data.filter((row) => {
+    const { fromDate, toDate, dateOption, exactDate } = filter;
+    const { member, age, ageCondition, filterCondition } = customFilters;
+
+    // Normalize createdAt for date filters
+   
+    const createdAtDate = dayjs(row.createdAt);
+    const today = dayjs();
+
+    const normalizeDate = (date) => {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    };
+
+    // Check date range
+    let passesDateFilter = true;
+
+    switch (dateOption) {
+      case "today":
+        passesDateFilter = createdAtDate.isSame(today, "day");
+        break;
+      case "exactDate":
+        passesDateFilter = exactDate
+          ? createdAtDate.isSame(normalizeDate(exactDate), "day")
+          : true;
+        break;
+      case "beforeDate":
+        passesDateFilter = fromDate
+          ? createdAtDate.isBefore(normalizeDate(fromDate), "day")
+          : true;
+        break;
+      case "afterDate":
+        passesDateFilter = toDate
+          ? createdAtDate.isAfter(normalizeDate(toDate), "day")
+          : true;
+        break;
+      default:
+        if (fromDate && toDate) {
+          const startDate = normalizeDate(fromDate);
+          const endDate = normalizeDate(toDate);
+          passesDateFilter =
+            createdAtDate >= startDate && createdAtDate <= endDate;
+        } else if (fromDate) {
+          const startDate = normalizeDate(fromDate);
+          passesDateFilter = createdAtDate >= startDate;
+        } else if (toDate) {
+          const endDate = normalizeDate(toDate);
+          passesDateFilter = createdAtDate <= endDate;
+        }
+    }
+    // Check member filter
+    const matchesMember = member
+      ? row.member.toLowerCase().includes(member.toLowerCase())
+      : true;
+
+    // Apply age condition
+    const ageValue = parseInt(age, 10);
+    let matchesAge = true;
+    if (age && !isNaN(ageValue)) {
+      switch (ageCondition) {
+        case "<":
+          matchesAge = row.age < ageValue;
+          break;
+        case ">":
+          matchesAge = row.age > ageValue;
+          break;
+        case "<=":
+          matchesAge = row.age <= ageValue;
+          break;
+        case ">=":
+          matchesAge = row.age >= ageValue;
+          break;
+        case "=":
+          matchesAge = row.age === ageValue;
+          break;
+        case "!=":
+          matchesAge = row.age !== ageValue;
+          break;
+        default:
+          matchesAge = true; // Default to match all if no condition selected
+      }
+    }
+    // Apply AND or OR logic based on filterCondition
+    const passesCustomFilter =
+      filterCondition === "all"
+        ? matchesMember && matchesAge // AND condition
+        : matchesMember || matchesAge; // OR condition
+});
+
+  // useEffect(() => {
+  //   setAllFilterData(filteredData)
+  // },[filteredData])
+
+ 
   const deleteHandle = (id) => {
     if (window.confirm("Would you like to delete this row?")) {
       axios.delete(`http://localhost:7779/members/${id}`).then(() => {
@@ -332,6 +367,30 @@ const MembersTable = () => {
     setFilterModel(newFilterModel); // Update filter model
   };
 
+  const handleProfessionSelect = (newProfession) => {
+    if (newProfession) {
+      console.log("Selected Profession:", newProfession);
+      const filterProfessionData = data.filter(
+        (row) => row.profession === newProfession
+      );
+      setAllFilterData(filterProfessionData);
+    } else {
+      console.log("Clearing city filter...");
+      setAllFilterData(data); // Reset to original data when no city is selected
+    }
+  };
+
+  const handleCitySelect = (newCity) => {
+    if (newCity) {
+      console.log("Selected City:", newCity);
+      const filterCityData = data.filter((row) => row.city === newCity);
+      setAllFilterData(filterCityData);
+    } else {
+      console.log("Clearing city filter...");
+      setAllFilterData(data); // Reset to original data when no city is selected
+    }
+  };
+
   const handleSelectionChange = (newSelection) => {
     // Get the rows visible on the current page
     const visibleRows = data.slice(0, paginationModel.pageSize);
@@ -359,7 +418,8 @@ const MembersTable = () => {
       // Handle "Select All" checkbox change
       const { checked } = eventOrIds.target;
       console.log(checked, "check");
-      const allIds = filteredData.map((row) => row.id);
+      const allIds = data.map((row) => row.id);
+      console.log(filterModel, "btm");
       if (checked) {
         console.log(allIds, "allids");
         // Select all rows across the filtered data
@@ -382,342 +442,368 @@ const MembersTable = () => {
       }
     }
   };
-
   const showThebottomButtons = globalSelectedRows.length > 0;
   console.log(data, "Data");
   return (
-    <Box pb={2}>
-      <Grid container spacing={6}>
-        <Grid item xs={12}>
-          <Card sx={{ height: "100%" }}>
-            <Box
-              mx={2}
-              mt={2}
-              py={1}
-              px={2}
-              variant="gradient"
-              bgColor="info"
-              borderRadius="lg"
-              coloredShadow="info"
-            >
-              <Typography
-                variant="h5"
-                color="#787879"
-                align="left"
-                fontFamily={"serif"}
+    <LocalizationProvider>
+      <Box pb={2}>
+        <Grid container spacing={6}>
+          <Grid item xs={12}>
+            <Card sx={{ height: "100%" }}>
+              <Box
+                mx={2}
+                mt={2}
+                py={1}
+                px={2}
+                variant="gradient"
+                bgColor="info"
+                borderRadius="lg"
+                coloredShadow="info"
+                display={"flex"}
+                gap={5}
               >
-                Members Table
-              </Typography>
-            </Box>
-            <Box p={2}>
-              <Grid
-                container
-                spacing={2}
-                alignItems="right" // Vertically center the items
-              >
+                <Typography
+                  variant="h5"
+                  color="#787879"
+                  align="left"
+                  fontFamily={"serif"}
+                >
+                  Members Table
+                </Typography>
+
+                <DateFilterPopover filter={filter} setFilter={setFilter} />
+                <ProfessionFilterComponent
+                  handleProfessionSelect={handleProfessionSelect}
+                  handleClearSelection={() => handleProfessionSelect("")}
+                />
+                <CityFilterComponent
+                  handleCitySelect={handleCitySelect}
+                  handleClearSelection={() => handleCitySelect("")}
+                />
+              </Box>
+              <Box p={2}>
                 <Grid
                   container
                   spacing={2}
-                  alignItems="center" // Vertically center the items
-                  justifyContent="space-between" // This will push items to the left and right
+                  alignItems="right" // Vertically center the items
                 >
-                  <Grid item xs={4} sx={{ ml: "25px", mt: "20px" }}>
-                    <TextField
-                      label="Search"
-                      variant="outlined"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)} // Update the search query state
+                  <Grid
+                    container
+                    spacing={2}
+                    alignItems="center" // Vertically center the items
+                    justifyContent="space-between" // This will push items to the left and right
+                  >
+                    <Grid item xs={4} sx={{ ml: "25px", mt: "20px" }}>
+                      <TextField
+                        label="Search"
+                        variant="outlined"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)} // Update the search query state
+                        sx={{
+                          mb: 2.5, // Optional margin for spacing
+                          "& .MuiInputBase-root": {
+                            height: "35px", // Set the height of the input field
+                            padding: "0 8px", // Adjust padding to keep it compact
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            height: "45px", // Ensure the outline matches the input field height
+                          },
+                          "& .MuiInputLabel-root": {
+                            top: "-6px", // Adjust label position to be vertically aligned
+                            fontSize: "1rem", // Optional: smaller label text
+                          },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Buttons and DateDropdown Section (Right) */}
+                    <Grid item>
+                      <Box display="flex" alignItems="center" gap={2} m={2}>
+                        <Button
+                          variant="outlined"
+                          color="#787879"
+                          onClick={exportToCSV}
+                        >
+                          Export to CSV
+                        </Button>
+
+                        {/* Add Button for opening the Drawer */}
+                        <Button
+                          variant="outlined"
+                          color="#787879"
+                          onClick={toggleDrawer}
+                        >
+                          My Filters
+                        </Button>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                
+                <DataGrid
+                  rows={allFilterData}
+                  columns={columns}
+                  checkboxSelection
+                  disableSelectionOnClick={false}
+                  rowSelectionModel={globalSelectedRows}
+                  onRowSelectionModelChange={handleSelectionChange}
+                  pagination
+                  pageSize={paginationModel.pageSize}
+                  page={paginationModel.page}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 25 },
+                    },
+                  }}
+                  pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
+                  rowCount={300} // Make sure this reflects the total number of members
+                  onPaginationModelChange={handlePaginationChange}
+                  filterModel={filterModel}
+                  onFilterModelChange={handleFilterChangeDate}
+                  paginationMode="server" // Client-side pagination
+                  loading={loading}
+                  sx={{
+                    height: 600, // Set a fixed height
+                    width: "100%",
+                    // overflowY: "auto", // Enable vertical scrolling
+                    "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root": {
+                      color: "white",
+                    },
+                    "& .MuiDataGrid-columnHeader": {
+                      backgroundColor: "#787877",
+                      color: "white",
+                      maxHeight: 70,
+                    },
+                    "& .MuiDataGrid-columnHeaderTitle": {
+                      color: "white",
+                    },
+                    "& .MuiDataGrid-columnMenuIcon": {
+                      color: "#fffff !important",
+                    },
+                    "& .MuiDataGrid-menu": {
+                      backgroundColor: "#1976d2",
+                    },
+                    "& .MuiMenuItem-root": {
+                      color: "white",
+                    },
+                    "& .MuiDataGrid-menuItem-root:hover": {
+                      backgroundColor: "#1565c0",
+                    },
+                    "& .MuiDataGrid-sortIcon": {
+                      opacity: 1,
+                      color: "white",
+                    },
+                    "& .MuiDataGrid-menuIconButton": {
+                      opacity: 1,
+                      color: "white",
+                    },
+                    "& .MuiDataGrid-filterIcon": {
+                      opacity: 1,
+                      color: "white",
+                    },
+                  }}
+                />
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 2,
+                    backgroundColor: "#ffff",
+                    borderTop: "1px solid #ccc",
+                  }}
+                >
+                  <span>
+                    Selected Rows:{" "}
+                    <strong>
+                      {globalSelectedRows.length === filteredData.length
+                        ? "SelectedAll"
+                        : globalSelectedRows.length}
+                    </strong>
+                  </span>
+                  <span>
+                    Total Rows: <strong>{filteredData.length}</strong>
+                  </span>
+                </Box>
+              </Box>
+
+              {/* Conditional rendering of Apply/Cancel buttons */}
+
+              {showThebottomButtons && (
+                <Box
+                  key={uuidv4()}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "start",
+                    m: 2,
+                    position: "fixed",
+                    bottom: 10,
+                    width: "83%",
+                    backgroundColor: "#787877",
+                    gap: 2,
+                    zIndex: 100,
+                    p: 0.5,
+                    mr: "530px",
+                    borderRadius: "7px", // Set the border radius here
+                    boxShadow: 3, // Optional: add shadow for better visibility
+                    mb: 15,
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    color="white"
+                    onClick={handleApplyClick}
+                    sx={{ maxHeight: 35, mt: 1.2, color: "#ffff", ml: 2 }}
+                  >
+                    Apply
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="white"
+                    sx={{ maxHeight: 35, mt: 1.2, color: "#ffff" }}
+                    onClick={() => setGlobalSelectedRows([])} // Reset selection on cancel
+                  >
+                    Cancel
+                  </Button>
+                  <Box mb={0.5}>
+                    <TableDropdown />
+                  </Box>
+
+                  <Box display={"flex"} mt={1} mb={1}>
+                    <Checkbox
+                      checked={checkedBox}
+                      onChange={handleSelection}
+                      value="checkedBox"
                       sx={{
-                        mb: 2.5, // Optional margin for spacing
-                        "& .MuiInputBase-root": {
-                          height: "35px", // Set the height of the input field
-                          padding: "0 8px", // Adjust padding to keep it compact
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          height: "45px", // Ensure the outline matches the input field height
-                        },
-                        "& .MuiInputLabel-root": {
-                          top: "-6px", // Adjust label position to be vertically aligned
-                          fontSize: "1rem", // Optional: smaller label text
+                        color: "white", // Set the checkbox color to white
+                        "&.Mui-checked": {
+                          color: "white", // Set checked state color to white
                         },
                       }}
                     />
-                  </Grid>
-
-                  {/* Buttons and DateDropdown Section (Right) */}
-                  <Grid item>
-                    <Box display="flex" alignItems="center" gap={2} m={2}>
-                      <Button
-                        variant="outlined"
-                        color="#787879"
-                        onClick={exportToCSV}
-                      >
-                        Export to CSV
-                      </Button>
-
-                      {/* Add Button for opening the Drawer */}
-                      <Button
-                        variant="outlined"
-                        color="#787879"
-                        onClick={toggleDrawer}
-                      >
-                        My Filters
-                      </Button>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Grid>
-
-              <DataGrid
-                rows={filteredData}
-                columns={columns}
-                checkboxSelection
-                disableSelectionOnClick={false}
-                rowSelectionModel={globalSelectedRows}
-                onRowSelectionModelChange={handleSelectionChange}
-                pagination
-                pageSize={paginationModel.pageSize}
-                page={paginationModel.page}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 25 },
-                  },
-                }}
-                pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
-                rowCount={300} // Make sure this reflects the total number of members
-                onPaginationModelChange={handlePaginationChange}
-                filterModel={filterModel}
-                onFilterModelChange={handleFilterChangeDate}
-                paginationMode="server" // Client-side pagination
-                loading={loading}
-                sx={{
-                  height: 600, // Set a fixed height
-                  width: "100%",
-                  // overflowY: "auto", // Enable vertical scrolling
-                  "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root": {
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-columnHeader": {
-                    backgroundColor: "#787877",
-                    color: "white",
-                    maxHeight: 70,
-                  },
-                  "& .MuiDataGrid-columnHeaderTitle": {
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-columnMenuIcon": {
-                    color: "#fffff !important",
-                  },
-                  "& .MuiDataGrid-menu": {
-                    backgroundColor: "#1976d2",
-                  },
-                  "& .MuiMenuItem-root": {
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-menuItem-root:hover": {
-                    backgroundColor: "#1565c0",
-                  },
-                  "& .MuiDataGrid-sortIcon": {
-                    opacity: 1,
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-menuIconButton": {
-                    opacity: 1,
-                    color: "white",
-                  },
-                  "& .MuiDataGrid-filterIcon": {
-                    opacity: 1,
-                    color: "white",
-                  },
-                }}
-              />
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: 2,
-                  backgroundColor: "#ffff",
-                  borderTop: "1px solid #ccc",
-                }}
-              >
-                <span>
-                  Selected Rows:{" "}
-                  <strong>
-                    {globalSelectedRows.length === filteredData.length
-                      ? "SelectedAll"
-                      : globalSelectedRows.length}
-                  </strong>
-                </span>
-                <span>
-                  Total Rows: <strong>{filteredData.length}</strong>
-                </span>
-              </Box>
-            </Box>
-
-            {/* Conditional rendering of Apply/Cancel buttons */}
-
-            {showThebottomButtons && (
-              <Box
-                key={uuidv4()}
-                sx={{
-                  display: "flex",
-                  justifyContent: "start",
-                  m: 2,
-                  position: "fixed",
-                  bottom: 10,
-                  width: "83%",
-                  backgroundColor: "#787877",
-                  gap: 2,
-                  zIndex: 100,
-                  p: 0.5,
-                  mr: "530px",
-                  borderRadius: "7px", // Set the border radius here
-                  boxShadow: 3, // Optional: add shadow for better visibility
-                  mb: 15,
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  color="white"
-                  onClick={handleApplyClick}
-                  sx={{ maxHeight: 35, mt: 1.2, color: "#ffff", ml: 2 }}
-                >
-                  Apply
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="white"
-                  sx={{ maxHeight: 35, mt: 1.2, color: "#ffff" }}
-                  onClick={() => setGlobalSelectedRows([])} // Reset selection on cancel
-                >
-                  Cancel
-                </Button>
-                <Box mb={0.5}>
-                  <TableDropdown />
+                    <Typography variant="h6" color="#ffff" sx={{ mt: 0.7 }}>
+                      For All
+                    </Typography>
+                  </Box>
                 </Box>
-
-                <Box display={"flex"} mt={1} mb={1}>
-                  <Checkbox
-                    checked={checkedBox}
-                    onChange={handleSelection}
-                    value="checkedBox"
-                    sx={{
-                      color: "white", // Set the checkbox color to white
-                      "&.Mui-checked": {
-                        color: "white", // Set checked state color to white
-                      },
-                    }}
-                  />
-                  <Typography variant="h6" color="#ffff" sx={{ mt: 0.7 }}>
-                    For All
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-          </Card>
+              )}
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {/* Drawer Component */}
+        {/* Drawer Component */}
 
-      <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
-        <Box p={2} width="500px">
-          <Typography variant="h6" color="textPrimary">
-            My Filters
-          </Typography>
-          <Box textAlign={"center"}>
-            <FormControl sx={{ width: "50%" }} margin="normal">
-              <InputLabel>Filter Condition</InputLabel>
-              <Select
-                value={customFilters.filterCondition}
-                onChange={(e) => {
-                  const filterCondition = e.target.value;
-                  setCustomFilters((prev) => ({
-                    ...prev,
-                    filterCondition,
-                  }));
-                }}
-              >
-                <MenuItem value="all">All (AND)</MenuItem>
-                <MenuItem value="any">Any (OR)</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <TextField
-            label="Member"
-            fullWidth
-            name="member"
-            value={customFilters.member}
-            onChange={(e) =>
-              setCustomFilters((prev) => ({
-                ...prev,
-                member: e.target.value,
-              }))
-            }
-            margin="normal"
-          />
-          <Box mt={2}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel>Age Condition</InputLabel>
-                  <Select
-                    value={customFilters.ageCondition}
+        <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
+          <Box p={2} width="500px">
+            <Typography variant="h6" color="textPrimary">
+              My Filters
+            </Typography>
+            <Box textAlign={"center"}>
+              <FormControl sx={{ width: "50%" }} margin="normal">
+                <InputLabel>Filter Condition</InputLabel>
+                <Select
+                  value={customFilters.filterCondition}
+                  onChange={(e) => {
+                    const filterCondition = e.target.value;
+                    setCustomFilters((prev) => ({
+                      ...prev,
+                      filterCondition,
+                    }));
+                  }}
+                >
+                  <MenuItem value="all">All </MenuItem>
+                  <MenuItem value="any">Any</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <TextField
+              label="Member"
+              fullWidth
+              name="member"
+              value={customFilters.member}
+              onChange={(e) =>
+                setCustomFilters((prev) => ({
+                  ...prev,
+                  member: e.target.value,
+                }))
+              }
+              margin="normal"
+            />
+            <Box textAlign={'center'}>
+             
+            {customFilters.filterCondition === "all" ? (
+              <Typography>  <strong>AND</strong></Typography>
+            ) : (
+              <Typography><strong>OR</strong></Typography>
+            )}
+            
+            </Box>
+            <Box mt={2}>
+              <Grid container spacing={2}>
+                <Grid item xs={6} mt={2}>
+                  <FormControl fullWidth>
+                    <InputLabel>Age Condition</InputLabel>
+                    <Select
+                      value={customFilters.ageCondition}
+                      onChange={(e) =>
+                        setCustomFilters((prev) => ({
+                          ...prev,
+                          ageCondition: e.target.value,
+                        }))
+                      }
+                    >
+                      <MenuItem value="=">=</MenuItem>
+                      <MenuItem value="!=">!=</MenuItem>
+                      <MenuItem value="<">&lt;</MenuItem>
+                      <MenuItem value=">">&gt;</MenuItem>
+                      <MenuItem value="<=">&lt;=</MenuItem>
+                      <MenuItem value=">=">&gt;=</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <TextField
+                    label="Age"
+                    fullWidth
+                    name="age"
+                    value={customFilters.age}
                     onChange={(e) =>
                       setCustomFilters((prev) => ({
                         ...prev,
-                        ageCondition: e.target.value,
+                        age: e.target.value,
                       }))
                     }
-                  >
-                    <MenuItem value="=">=</MenuItem>
-                    <MenuItem value="!=">!=</MenuItem>
-                    <MenuItem value="<">&lt;</MenuItem>
-                    <MenuItem value=">">&gt;</MenuItem>
-                    <MenuItem value="<=">&lt;=</MenuItem>
-                    <MenuItem value=">=">&gt;=</MenuItem>
-                  </Select>
-                </FormControl>
+                    margin="normal"
+                  />
+                </Grid>
               </Grid>
-
-              <Grid item xs={6}>
-                <TextField
-                  label="Age"
-                  fullWidth
-                  name="age"
-                  value={customFilters.age}
-                  onChange={(e) =>
-                    setCustomFilters((prev) => ({
-                      ...prev,
-                      age: e.target.value,
-                    }))
-                  }
-                  margin="normal"
-                />
-              </Grid>
-            </Grid>
+            </Box>
           </Box>
-        </Box>
 
-        <Box m={2}>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() =>
-              setCustomFilters({ member: "", age: "", filterCondition: "all" })
-            }
-          >
-            Reset Filters
-          </Button>
-        </Box>
-        <Box m={2}>
-          <Typography m={2}>Date Filters</Typography>
-          <DateRangeFilter filter={filter} setFilter={setFilter} />
-        </Box>
-      </Drawer>
-    </Box>
+          <Box m={2}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() =>
+                setCustomFilters({
+                  member: "",
+                  age: "",
+                  filterCondition: "all",
+                })
+              }
+            >
+              Reset Filters
+            </Button>
+          </Box>
+          <Box m={2}>
+            <Typography m={2}>Date Filters</Typography>
+            <DateRangeFilter filter={filter} setFilter={setFilter} />
+          </Box>
+        </Drawer>
+      </Box>
+    </LocalizationProvider>
   );
 };
 
