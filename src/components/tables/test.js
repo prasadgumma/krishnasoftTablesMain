@@ -1251,7 +1251,7 @@ import MenuIcon from "@mui/icons-material/Menu"; // For mobile drawer
 import MembersTable from "./table-plugins1"; // Assuming this is your existing MembersTable component
 
 function ContactsListWithFolders() {
-  const [folders, setFolders] = useState(['My First Folder']);
+  const [folders, setFolders] = useState(["My First Folder"]);
   const [open, setOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -1286,7 +1286,6 @@ function ContactsListWithFolders() {
   return (
     <Box>
       <Card>
-
         {/* Dialog for Adding a Folder */}
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Create New Folder</DialogTitle>
@@ -1369,14 +1368,18 @@ function ContactsListWithFolders() {
         {/* Main Grid Layout */}
         <Grid container spacing={2}>
           {/* Folders on the Left (on larger screens) */}
-          <Grid item xs={12} md={2.6} sx={{ display: { xs: "none", md: "block" } }}>
+          <Grid
+            item
+            xs={12}
+            md={2.6}
+            sx={{ display: { xs: "none", md: "block" } }}
+          >
             <Box borderRight="1px solid #ddd" p={2}>
-            <Typography variant="h6" m={1} ml={2}>
-                 List of Tables
-                </Typography>
+              <Typography variant="h6" m={1} ml={2}>
+                List of Tables
+              </Typography>
               {/* Search and New Folder button inside Left Sidebar */}
               <Box display="flex" alignItems="center" mb={2} mt={1.5}>
-
                 <SearchIcon />
                 <TextField
                   placeholder="Search"
@@ -1392,11 +1395,11 @@ function ContactsListWithFolders() {
                 color="primary"
                 startIcon={<AddIcon />}
                 onClick={handleOpen}
-                sx={{ mb: 1.5,mt:2, width: "100%" }}
+                sx={{ mb: 1.5, mt: 2, width: "100%" }}
               >
                 New Folder
               </Button>
-<hr ></hr>
+              <hr></hr>
               <List>
                 {filteredFolders.map((folder, index) => (
                   <ListItem
@@ -1432,4 +1435,3 @@ function ContactsListWithFolders() {
 }
 
 export default ContactsListWithFolders;
-

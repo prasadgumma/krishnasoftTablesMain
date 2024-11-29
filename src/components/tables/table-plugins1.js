@@ -9,9 +9,7 @@ import {
   Card,
   IconButton,
   Checkbox,
-  Drawer,
   TextField,
-  MenuItem,
   FormControl,
   Select,
   InputLabel,
@@ -27,6 +25,9 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import ProfessionFilterComponent from "./proffession-filter";
 import CityFilterComponent from "./city-filter";
+import FilterDrawer from "./filter-drawer";
+import FilterComponent from "./combined-filters";
+import DateDropdown from "./date-dropdown";
 
 const MembersTable = () => {
   const [data, setData] = useState([]);
@@ -35,26 +36,32 @@ const MembersTable = () => {
     page: 0,
     pageSize: 25,
   });
-  const [filter, setFilter] = useState({
-    fromDate: "",
-    toDate: "",
-  }); // State for date range filter
-  const [openDrawer, setOpenDrawer] = useState(false);
+
   const [filterModel, setFilterModel] = useState({
     items: [],
   });
-  const [customFilters, setCustomFilters] = useState({
-    member: "",
-    age: "",
-    ageCondition: "", // Default condition
-    filterCondition: "all", // 'all' for AND, 'any' for OR
-  });
+
   const [allFilterData, setAllFilterData] = useState();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const toggleDrawer = () => setOpenDrawer(!openDrawer);
 
+  const [customFilters, setCustomFilters] = useState({
+    member: "",
+    age: "",
+    ageCondition: "",
+    filterCondition: "all",
+  });
+
+  const [filter, setFilter] = useState({
+    fromDate: null,
+    toDate: null,
+    dateOption: "",
+    exactDate: null,
+  });
 
   const [selectedColumns] = useState({
     id: true,
@@ -170,15 +177,12 @@ const MembersTable = () => {
     },
   ];
 
-
   useEffect(() => {
     const fetchMembers = async () => {
       try {
         const { page, pageSize } = paginationModel;
         const start = page * pageSize;
         const end = (page + 1) * pageSize;
-
-        // Make the API call with pagination parameters
         const response = await axios.get("http://localhost:7779/members", {
           params: {
             _page: page + 1, // Assuming your API expects 1-based page index
@@ -218,7 +222,6 @@ const MembersTable = () => {
     const { member, age, ageCondition, filterCondition } = customFilters;
 
     // Normalize createdAt for date filters
-   
     const createdAtDate = dayjs(row.createdAt);
     const today = dayjs();
 
@@ -293,21 +296,28 @@ const MembersTable = () => {
           matchesAge = row.age !== ageValue;
           break;
         default:
-          matchesAge = true; // Default to match all if no condition selected
+          matchesAge = false; // Default to match all if no condition selected
       }
     }
+
     // Apply AND or OR logic based on filterCondition
     const passesCustomFilter =
       filterCondition === "all"
         ? matchesMember && matchesAge // AND condition
         : matchesMember || matchesAge; // OR condition
-});
 
-  // useEffect(() => {
-  //   setAllFilterData(filteredData)
-  // },[filteredData])
+    return passesDateFilter && passesCustomFilter;
+    console.log(matchesMember, matchesAge, "PC");
+  });
+  console.log(filteredData, "Drawer");
 
- 
+  const resetData = () => {
+    setAllFilterData(data); // Restore to the unfiltered data set
+  };
+  const applyHandler = () => {
+    setAllFilterData(filteredData);
+  };
+
   const deleteHandle = (id) => {
     if (window.confirm("Would you like to delete this row?")) {
       axios.delete(`http://localhost:7779/members/${id}`).then(() => {
@@ -359,11 +369,8 @@ const MembersTable = () => {
     }
   };
 
-  const toggleDrawer = () => {
-    setOpenDrawer(!openDrawer);
-  };
-
   const handleFilterChangeDate = (newFilterModel) => {
+    console.log(handleFilterChangeDate, "handleFilterChangeDate");
     setFilterModel(newFilterModel); // Update filter model
   };
 
@@ -379,7 +386,6 @@ const MembersTable = () => {
       setAllFilterData(data); // Reset to original data when no city is selected
     }
   };
-
   const handleCitySelect = (newCity) => {
     if (newCity) {
       console.log("Selected City:", newCity);
@@ -447,7 +453,7 @@ const MembersTable = () => {
   return (
     <LocalizationProvider>
       <Box pb={2}>
-        <Grid container spacing={6}>
+        <Grid container spacing={4}>
           <Grid item xs={12}>
             <Card sx={{ height: "100%" }}>
               <Box
@@ -460,25 +466,27 @@ const MembersTable = () => {
                 borderRadius="lg"
                 coloredShadow="info"
                 display={"flex"}
-                gap={5}
+                gap={6}
               >
                 <Typography
                   variant="h5"
                   color="#787879"
                   align="left"
                   fontFamily={"serif"}
+                  width={"18%"}
                 >
                   Members Table
                 </Typography>
+                {/* <DateDropdown /> */}
+                {/* <DateFilterPopover filter={filter} setFilter={setFilter} /> */}
 
-                <DateFilterPopover filter={filter} setFilter={setFilter} />
-                <ProfessionFilterComponent
-                  handleProfessionSelect={handleProfessionSelect}
-                  handleClearSelection={() => handleProfessionSelect("")}
-                />
-                <CityFilterComponent
+                <FilterComponent
                   handleCitySelect={handleCitySelect}
-                  handleClearSelection={() => handleCitySelect("")}
+                  handleProfessionSelect={handleProfessionSelect}
+                  handleClearCitySelection={() => handleCitySelect("")}
+                  handleClearProfessionSelection={() =>
+                    handleProfessionSelect("")
+                  }
                 />
               </Box>
               <Box p={2}>
@@ -516,7 +524,6 @@ const MembersTable = () => {
                       />
                     </Grid>
 
-                    {/* Buttons and DateDropdown Section (Right) */}
                     <Grid item>
                       <Box display="flex" alignItems="center" gap={2} m={2}>
                         <Button
@@ -527,7 +534,6 @@ const MembersTable = () => {
                           Export to CSV
                         </Button>
 
-                        {/* Add Button for opening the Drawer */}
                         <Button
                           variant="outlined"
                           color="#787879"
@@ -539,7 +545,7 @@ const MembersTable = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-                
+
                 <DataGrid
                   rows={allFilterData}
                   columns={columns}
@@ -617,18 +623,16 @@ const MembersTable = () => {
                   <span>
                     Selected Rows:{" "}
                     <strong>
-                      {globalSelectedRows.length === filteredData.length
+                      {globalSelectedRows.length === data.length
                         ? "SelectedAll"
                         : globalSelectedRows.length}
                     </strong>
                   </span>
                   <span>
-                    Total Rows: <strong>{filteredData.length}</strong>
+                    Total Rows: <strong>{data.length}</strong>
                   </span>
                 </Box>
               </Box>
-
-              {/* Conditional rendering of Apply/Cancel buttons */}
 
               {showThebottomButtons && (
                 <Box
@@ -693,115 +697,18 @@ const MembersTable = () => {
         </Grid>
 
         {/* Drawer Component */}
-
-        <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
-          <Box p={2} width="500px">
-            <Typography variant="h6" color="textPrimary">
-              My Filters
-            </Typography>
-            <Box textAlign={"center"}>
-              <FormControl sx={{ width: "50%" }} margin="normal">
-                <InputLabel>Filter Condition</InputLabel>
-                <Select
-                  value={customFilters.filterCondition}
-                  onChange={(e) => {
-                    const filterCondition = e.target.value;
-                    setCustomFilters((prev) => ({
-                      ...prev,
-                      filterCondition,
-                    }));
-                  }}
-                >
-                  <MenuItem value="all">All </MenuItem>
-                  <MenuItem value="any">Any</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-            <TextField
-              label="Member"
-              fullWidth
-              name="member"
-              value={customFilters.member}
-              onChange={(e) =>
-                setCustomFilters((prev) => ({
-                  ...prev,
-                  member: e.target.value,
-                }))
-              }
-              margin="normal"
-            />
-            <Box textAlign={'center'}>
-             
-            {customFilters.filterCondition === "all" ? (
-              <Typography>  <strong>AND</strong></Typography>
-            ) : (
-              <Typography><strong>OR</strong></Typography>
-            )}
-            
-            </Box>
-            <Box mt={2}>
-              <Grid container spacing={2}>
-                <Grid item xs={6} mt={2}>
-                  <FormControl fullWidth>
-                    <InputLabel>Age Condition</InputLabel>
-                    <Select
-                      value={customFilters.ageCondition}
-                      onChange={(e) =>
-                        setCustomFilters((prev) => ({
-                          ...prev,
-                          ageCondition: e.target.value,
-                        }))
-                      }
-                    >
-                      <MenuItem value="=">=</MenuItem>
-                      <MenuItem value="!=">!=</MenuItem>
-                      <MenuItem value="<">&lt;</MenuItem>
-                      <MenuItem value=">">&gt;</MenuItem>
-                      <MenuItem value="<=">&lt;=</MenuItem>
-                      <MenuItem value=">=">&gt;=</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextField
-                    label="Age"
-                    fullWidth
-                    name="age"
-                    value={customFilters.age}
-                    onChange={(e) =>
-                      setCustomFilters((prev) => ({
-                        ...prev,
-                        age: e.target.value,
-                      }))
-                    }
-                    margin="normal"
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-          </Box>
-
-          <Box m={2}>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() =>
-                setCustomFilters({
-                  member: "",
-                  age: "",
-                  filterCondition: "all",
-                })
-              }
-            >
-              Reset Filters
-            </Button>
-          </Box>
-          <Box m={2}>
-            <Typography m={2}>Date Filters</Typography>
-            <DateRangeFilter filter={filter} setFilter={setFilter} />
-          </Box>
-        </Drawer>
+        <FilterDrawer
+          openDrawer={openDrawer}
+          toggleDrawer={toggleDrawer}
+          customFilters={customFilters}
+          setCustomFilters={setCustomFilters}
+          filter={filter}
+          setFilter={setFilter}
+          data={data}
+          applyHandler={applyHandler}
+          setData={setData}
+          resetData={resetData} // Pass the reset function
+        />
       </Box>
     </LocalizationProvider>
   );

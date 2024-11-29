@@ -1,83 +1,83 @@
-import React from "react";
-import { TextField, Box } from "@mui/material";
+// import React from "react";
+// import { TextField, Box } from "@mui/material";
 
-const DateRangeFilter = ({ filter, setFilter }) => {
-  const handleFromDateChange = (e) => {
-    setFilter({ ...filter, fromDate: e.target.value });
-  };
+// const DateRangeFilter = ({ filter, setFilter }) => {
+//   const handleFromDateChange = (e) => {
+//     setFilter({ ...filter, fromDate: e.target.value });
+//   };
 
-  const handleToDateChange = (e) => {
-    setFilter({ ...filter, toDate: e.target.value });
-  };
+//   const handleToDateChange = (e) => {
+//     setFilter({ ...filter, toDate: e.target.value });
+//   };
 
-  return (
-    <Box mb={2} sx={{ display: "flex", justifyContent: "start", gap: 2 }}>
-      <TextField
-        label="From Date"
-        type="date"
-        InputLabelProps={{
-          shrink: true, // Ensures the label stays above the input field
-        }}
-        value={filter.fromDate}
-        onChange={handleFromDateChange}
-        sx={{
-          width: "80%",
-          height: "35px",
-          "& .MuiInputBase-root": {
-            height: "35px",
-          },
-          "& .MuiInputLabel-root": {
-            color: "#787877", // Custom label color
-          },
-          "& .MuiInputBase-input": {
-            color: "#787877",
-            backgroundColor: "#f0f0f0", // Custom background color
-            height: "10px",
-          },
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#787877", // Custom border color
-          },
-          "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#787877", // Border color on hover
-          },
-        }}
-      />
+//   return (
+//     <Box mb={2} sx={{ display: "flex", justifyContent: "start", gap: 2 }}>
+//       <TextField
+//         label="From Date"
+//         type="date"
+//         InputLabelProps={{
+//           shrink: true, // Ensures the label stays above the input field
+//         }}
+//         value={filter.fromDate}
+//         onChange={handleFromDateChange}
+//         sx={{
+//           width: "80%",
+//           height: "35px",
+//           "& .MuiInputBase-root": {
+//             height: "35px",
+//           },
+//           "& .MuiInputLabel-root": {
+//             color: "#787877", // Custom label color
+//           },
+//           "& .MuiInputBase-input": {
+//             color: "#787877",
+//             backgroundColor: "#f0f0f0", // Custom background color
+//             height: "10px",
+//           },
+//           "& .MuiOutlinedInput-notchedOutline": {
+//             borderColor: "#787877", // Custom border color
+//           },
+//           "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+//             borderColor: "#787877", // Border color on hover
+//           },
+//         }}
+//       />
 
-      <TextField
-        label="To Date"
-        type="date"
-        InputLabelProps={{
-          shrink: true,
-        }}
-        value={filter.toDate}
-        onChange={handleToDateChange}
-        sx={{
-          width: "80%",
-          height: "40px",
-          "& .MuiInputBase-root": {
-            height: "35px",
-          },
-          "& .MuiInputLabel-root": {
-            color: "#787877", // Custom label color
-          },
-          "& .MuiInputBase-input": {
-            color: "#787877",
-            backgroundColor: "#f0f0f0", // Custom background color
-            height: "10px",
-          },
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#787877", // Custom border color
-          },
-          "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#787877 ", // Border color on hover
-          },
-        }}
-      />
-    </Box>
-  );
-};
+//       <TextField
+//         label="To Date"
+//         type="date"
+//         InputLabelProps={{
+//           shrink: true,
+//         }}
+//         value={filter.toDate}
+//         onChange={handleToDateChange}
+//         sx={{
+//           width: "80%",
+//           height: "40px",
+//           "& .MuiInputBase-root": {
+//             height: "35px",
+//           },
+//           "& .MuiInputLabel-root": {
+//             color: "#787877", // Custom label color
+//           },
+//           "& .MuiInputBase-input": {
+//             color: "#787877",
+//             backgroundColor: "#f0f0f0", // Custom background color
+//             height: "10px",
+//           },
+//           "& .MuiOutlinedInput-notchedOutline": {
+//             borderColor: "#787877", // Custom border color
+//           },
+//           "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+//             borderColor: "#787877 ", // Border color on hover
+//           },
+//         }}
+//       />
+//     </Box>
+//   );
+// };
 
-export default DateRangeFilter;
+// export default DateRangeFilter;
 
 // import React from "react";
 // import { Box, TextField } from "@mui/material";
@@ -260,3 +260,82 @@ export default DateRangeFilter;
 // };
 
 // export default DateRangeFilter;
+
+import React from "react";
+import { TextField, Box, Typography } from "@mui/material";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+
+const DateRangeFilter = ({ filter, setFilter }) => {
+  const handleFromDateChange = (newValue) => {
+    setFilter((prev) => ({ ...prev, fromDate: newValue }));
+  };
+
+  const handleToDateChange = (newValue) => {
+    setFilter((prev) => ({ ...prev, toDate: newValue }));
+  };
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Box mb={2}>
+        <Typography gutterBottom>Date Filters</Typography>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          {/* From Date Picker */}
+          <DatePicker
+            label="From Date"
+            value={filter.fromDate ? dayjs(filter.fromDate) : null}
+            onChange={handleFromDateChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "#787877",
+                    backgroundColor: "#f9f9f9",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#787877",
+                  },
+                  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#000",
+                    },
+                }}
+              />
+            )}
+          />
+
+          {/* To Date Picker */}
+          <DatePicker
+            label="To Date"
+            value={filter.toDate ? dayjs(filter.toDate) : null}
+            onChange={handleToDateChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "#787877",
+                    backgroundColor: "#f9f9f9",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#787877",
+                  },
+                  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#000",
+                    },
+                }}
+              />
+            )}
+          />
+        </Box>
+      </Box>
+    </LocalizationProvider>
+  );
+};
+
+export default DateRangeFilter;

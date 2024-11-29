@@ -28,7 +28,7 @@ const ProfessionFilterComponent = ({
   const handleProfessionClick = (profession) => {
     setSelectedProfession(profession); // Update selected profession
     handleProfessionSelect(profession); // Notify parent about the selected profession
-    handleClose(); // Close the popover
+    // handleClose(); // Close the popover
   };
 
   const handleClear = () => {
