@@ -10,24 +10,16 @@ import {
   IconButton,
   Checkbox,
   TextField,
-  FormControl,
-  Select,
-  InputLabel,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material"; // Import icons
 import TableDropdown from "./table-dropdown";
 import { DataGrid } from "@mui/x-data-grid";
-import DateRangeFilter from "./date-range-filter";
 import CreatedAtColumn from "./created-at-table";
 import { v4 as uuidv4 } from "uuid";
-import DateFilterPopover from "./date-filter";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import ProfessionFilterComponent from "./proffession-filter";
-import CityFilterComponent from "./city-filter";
 import FilterDrawer from "./filter-drawer";
 import FilterComponent from "./combined-filters";
-import DateDropdown from "./date-dropdown";
 
 const MembersTable = () => {
   const [data, setData] = useState([]);
@@ -36,13 +28,7 @@ const MembersTable = () => {
     page: 0,
     pageSize: 25,
   });
-
-  const [filterModel, setFilterModel] = useState({
-    items: [],
-  });
-
   const [allFilterData, setAllFilterData] = useState();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -192,7 +178,6 @@ const MembersTable = () => {
             _search: searchQuery,
           },
         });
-        console.log(response, "Res");
         const overAllData = response.data.map((member) => {
           // Use localStorage or state to persist createdAt
           const existingCreatedAt =
@@ -235,24 +220,24 @@ const MembersTable = () => {
     let passesDateFilter = true;
 
     switch (dateOption) {
-      case "today":
-        passesDateFilter = createdAtDate.isSame(today, "day");
-        break;
-      case "exactDate":
-        passesDateFilter = exactDate
-          ? createdAtDate.isSame(normalizeDate(exactDate), "day")
-          : true;
-        break;
-      case "beforeDate":
-        passesDateFilter = fromDate
-          ? createdAtDate.isBefore(normalizeDate(fromDate), "day")
-          : true;
-        break;
-      case "afterDate":
-        passesDateFilter = toDate
-          ? createdAtDate.isAfter(normalizeDate(toDate), "day")
-          : true;
-        break;
+      // case "today":
+      //   passesDateFilter = createdAtDate.isSame(today, "day");
+      //   break;
+      // case "exactDate":
+      //   passesDateFilter = exactDate
+      //     ? createdAtDate.isSame(normalizeDate(exactDate), "day")
+      //     : true;
+      //   break;
+      // case "beforeDate":
+      //   passesDateFilter = fromDate
+      //     ? createdAtDate.isBefore(normalizeDate(fromDate), "day")
+      //     : true;
+      //   break;
+      // case "afterDate":
+      //   passesDateFilter = toDate
+      //     ? createdAtDate.isAfter(normalizeDate(toDate), "day")
+      //     : true;
+      //   break;
       default:
         if (fromDate && toDate) {
           const startDate = normalizeDate(fromDate);
@@ -307,9 +292,7 @@ const MembersTable = () => {
         : matchesMember || matchesAge; // OR condition
 
     return passesDateFilter && passesCustomFilter;
-    console.log(matchesMember, matchesAge, "PC");
   });
-  console.log(filteredData, "Drawer");
 
   const resetData = () => {
     setAllFilterData(data); // Restore to the unfiltered data set
@@ -369,30 +352,21 @@ const MembersTable = () => {
     }
   };
 
-  const handleFilterChangeDate = (newFilterModel) => {
-    console.log(handleFilterChangeDate, "handleFilterChangeDate");
-    setFilterModel(newFilterModel); // Update filter model
-  };
-
   const handleProfessionSelect = (newProfession) => {
     if (newProfession) {
-      console.log("Selected Profession:", newProfession);
       const filterProfessionData = data.filter(
         (row) => row.profession === newProfession
       );
       setAllFilterData(filterProfessionData);
     } else {
-      console.log("Clearing city filter...");
       setAllFilterData(data); // Reset to original data when no city is selected
     }
   };
   const handleCitySelect = (newCity) => {
     if (newCity) {
-      console.log("Selected City:", newCity);
       const filterCityData = data.filter((row) => row.city === newCity);
       setAllFilterData(filterCityData);
     } else {
-      console.log("Clearing city filter...");
       setAllFilterData(data); // Reset to original data when no city is selected
     }
   };
@@ -415,26 +389,20 @@ const MembersTable = () => {
     } else {
       setCheckedBox(false);
     }
-
-    console.log(checkedBox);
   };
 
   const handleSelection = (eventOrIds) => {
     if (typeof eventOrIds === "object" && eventOrIds.target) {
       // Handle "Select All" checkbox change
       const { checked } = eventOrIds.target;
-      console.log(checked, "check");
       const allIds = data.map((row) => row.id);
-      console.log(filterModel, "btm");
       if (checked) {
-        console.log(allIds, "allids");
         // Select all rows across the filtered data
         setGlobalSelectedRows((prev) =>
           Array.from(new Set([...prev, ...allIds]))
         );
         setGlobalSelectedRows(allIds); // Select all rows on the current page
         setCheckedBox(checked);
-        // alert(`Selected all ${allIds.length} rows.`);
         alert(
           `Action will be applied to all items selected by the filter  ${allIds.length} rows.`
         );
@@ -449,7 +417,6 @@ const MembersTable = () => {
     }
   };
   const showThebottomButtons = globalSelectedRows.length > 0;
-  console.log(data, "Data");
   return (
     <LocalizationProvider>
       <Box pb={2}>
@@ -477,17 +444,15 @@ const MembersTable = () => {
                 >
                   Members Table
                 </Typography>
-                {/* <DateDropdown /> */}
-                {/* <DateFilterPopover filter={filter} setFilter={setFilter} /> */}
 
-                <FilterComponent
+                {/* <FilterComponent
                   handleCitySelect={handleCitySelect}
                   handleProfessionSelect={handleProfessionSelect}
                   handleClearCitySelection={() => handleCitySelect("")}
                   handleClearProfessionSelection={() =>
                     handleProfessionSelect("")
                   }
-                />
+                /> */}
               </Box>
               <Box p={2}>
                 <Grid
@@ -564,8 +529,6 @@ const MembersTable = () => {
                   pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
                   rowCount={300} // Make sure this reflects the total number of members
                   onPaginationModelChange={handlePaginationChange}
-                  filterModel={filterModel}
-                  onFilterModelChange={handleFilterChangeDate}
                   paginationMode="server" // Client-side pagination
                   loading={loading}
                   sx={{
@@ -708,6 +671,8 @@ const MembersTable = () => {
           applyHandler={applyHandler}
           setData={setData}
           resetData={resetData} // Pass the reset function
+          handleProfessionSelect={handleProfessionSelect}
+          handleCitySelect={handleCitySelect}
         />
       </Box>
     </LocalizationProvider>

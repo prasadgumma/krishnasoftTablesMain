@@ -1,491 +1,165 @@
-// import React, { useState, useEffect } from "react";
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableContainer,
-//   TableHead,
-//   TableRow,
-//   TextField,
-//   Autocomplete,
-//   Paper,
-//   Button,
-//   Drawer,
-//   Box,
-// } from "@mui/material";
-// import axios from "axios";
+import React, { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Checkbox,
+  IconButton,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 
-// function DepartmentTableWithFilters() {
-//   const [filters, setFilters] = useState({
-//     department: [],
-//     location: [],
-//     status: [],
-//     role: [],
-//     date: null,
-//   });
-//   const [data, setData] = useState([]);
-//   console.log(data, "DataMY");
-//   const [drawerOpen, setDrawerOpen] = useState(false);
+const MyTable = () => {
+  const [rows, setRows] = useState([
+    { id: 1, name: "John", status: "Active", age: 25 },
+    { id: 2, name: "Jane", status: "Inactive", age: 30 },
+    { id: 3, name: "Alice", status: "Active", age: 28 },
+  ]);
+  const [selected, setSelected] = useState([]);
+  const [editableCell, setEditableCell] = useState(null);
 
-//   // Fetch data from the API with filters
-//   const fetchData = async () => {
-//     try {
-//       const requestBody = {
-//         department: filters.department,
-//         location: filters.location,
-//         status: filters.status,
-//         role: filters.role,
-//         date: filters.date,
-//       };
-//       const response = await axios.post(
-//         "http://localhost:7779/departments",
-//         requestBody
-//       );
-//       setData(response.data);
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     }
-//   };
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      setSelected(rows.map((row) => row.id));
+    } else {
+      setSelected([]);
+    }
+  };
 
-//   // Fetch data when filters change
-//   useEffect(() => {
-//     fetchData();
-//   }, [filters]);
+  const handleRowClick = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
 
-//   const handleFilterChange = (filterKey, values) => {
-//     setFilters((prev) => ({ ...prev, [filterKey]: values }));
-//   };
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
 
-//   return (
-//     <div style={{ padding: "20px" }}>
-//       <Button variant="contained" onClick={() => setDrawerOpen(true)}>
-//         Open Filters
-//       </Button>
-//       <Drawer
-//         anchor="right"
-//         open={drawerOpen}
-//         onClose={() => setDrawerOpen(false)}
-//       >
-//         <Box p={3} width="300px" role="presentation">
-//           <h3>Filters</h3>
-//           <Autocomplete
-//             multiple
-//             options={["HR", "Engineering"]}
-//             onChange={(e, value) => handleFilterChange("department", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Department" />
-//             )}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["New York", "San Francisco", "Los Angeles"]}
-//             onChange={(e, value) => handleFilterChange("location", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Location" />
-//             )}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["Active", "Inactive"]}
-//             onChange={(e, value) => handleFilterChange("status", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Status" />
-//             )}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["Manager", "Engineer", "Recruiter", "HR Specialist"]}
-//             onChange={(e, value) => handleFilterChange("role", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Role" />
-//             )}
-//           />
-//           <TextField
-//             label="Filter by Date (After)"
-//             type="date"
-//             InputLabelProps={{ shrink: true }}
-//             onChange={(e) => handleFilterChange("date", e.target.value)}
-//             fullWidth
-//             style={{ marginTop: "20px" }}
-//           />
-//           <Button
-//             variant="outlined"
-//             fullWidth
-//             style={{ marginTop: "20px" }}
-//             onClick={() => setDrawerOpen(false)}
-//           >
-//             Apply Filters
-//           </Button>
-//         </Box>
-//       </Drawer>
-//       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>ID</TableCell>
-//               <TableCell>Name</TableCell>
-//               <TableCell>Department</TableCell>
-//               <TableCell>Location</TableCell>
-//               <TableCell>Status</TableCell>
-//               <TableCell>Role</TableCell>
-//               <TableCell>Date</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {data.length > 0 ? (
-//               data.map((row) => (
-//                 <TableRow key={row.id}>
-//                   <TableCell>{row.id}</TableCell>
-//                   <TableCell>{row.name}</TableCell>
-//                   <TableCell>{row.department}</TableCell>
-//                   <TableCell>{row.location}</TableCell>
-//                   <TableCell>{row.status}</TableCell>
-//                   <TableCell>{row.role}</TableCell>
-//                   <TableCell>{row.date}</TableCell>
-//                 </TableRow>
-//               ))
-//             ) : (
-//               <TableRow>
-//                 <TableCell colSpan={7} align="center">
-//                   No matching data
-//                 </TableCell>
-//               </TableRow>
-//             )}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-//     </div>
-//   );
-// }
+    setSelected(newSelected);
+  };
 
-// export default DepartmentTableWithFilters;
+  const handleEdit = (id, column) => {
+    setEditableCell({ id, column });
+  };
 
-// import React, { useState, useEffect } from "react";
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableContainer,
-//   TableHead,
-//   TableRow,
-//   TextField,
-//   Autocomplete,
-//   Paper,
-//   Button,
-//   Drawer,
-//   Box,
-// } from "@mui/material";
-// import axios from "axios";
+  const handleChange = (event, id, column) => {
+    const value = event.target.value;
+    setRows(
+      rows.map((row) => (row.id === id ? { ...row, [column]: value } : row))
+    );
+    setEditableCell(null);
+  };
 
-// function DepartmentTableWithFilters() {
-//   const [filters, setFilters] = useState({
-//     department: [],
-//     location: [],
-//     status: [],
-//     role: [],
-//     date: null,
-//   });
-//   const [data, setData] = useState([]);
-//   const [drawerOpen, setDrawerOpen] = useState(false);
+  return (
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell padding="checkbox">
+              <Checkbox
+                indeterminate={
+                  selected.length > 0 && selected.length < rows.length
+                }
+                checked={rows.length > 0 && selected.length === rows.length}
+                onChange={handleSelectAllClick}
+              />
+            </TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Age</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => {
+            const isSelected = selected.indexOf(row.id) !== -1;
+            return (
+              <TableRow
+                hover
+                onClick={(event) => handleRowClick(event, row.id)}
+                role="checkbox"
+                aria-checked={isSelected}
+                tabIndex={-1}
+                key={row.id}
+                selected={isSelected}
+              >
+                <TableCell padding="checkbox">
+                  <Checkbox checked={isSelected} />
+                </TableCell>
+                <TableCell>
+                  {editableCell?.id === row.id &&
+                  editableCell?.column === "name" ? (
+                    <input
+                      value={row.name}
+                      onChange={(e) => handleChange(e, row.id, "name")}
+                      autoFocus
+                    />
+                  ) : (
+                    row.name
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editableCell?.id === row.id &&
+                  editableCell?.column === "status" ? (
+                    <FormControl fullWidth>
+                      <InputLabel>Status</InputLabel>
+                      <Select
+                        value={row.status}
+                        onChange={(e) => handleChange(e, row.id, "status")}
+                      >
+                        <MenuItem value="Active">Active</MenuItem>
+                        <MenuItem value="Inactive">Inactive</MenuItem>
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    row.status
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editableCell?.id === row.id &&
+                  editableCell?.column === "age" ? (
+                    <input
+                      type="number"
+                      value={row.age}
+                      onChange={(e) => handleChange(e, row.id, "age")}
+                      autoFocus
+                    />
+                  ) : (
+                    row.age
+                  )}
+                </TableCell>
+                <TableCell>
+                  <IconButton onClick={() => handleEdit(row.id, "name")}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton onClick={() => handleEdit(row.id, "status")}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton onClick={() => handleEdit(row.id, "age")}>
+                    <EditIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
 
-//   // Function to build query parameters
-//   const buildQueryParams = () => {
-//     const params = new URLSearchParams();
-//     Object.keys(filters).forEach((key) => {
-//       const value = filters[key];
-//       if (Array.isArray(value) && value.length > 0) {
-//         params.append(key, value.join(","));
-//       } else if (value) {
-//         params.append(key, value);
-//       }
-//     });
-//     return params.toString();
-//   };
-
-//   // Fetch data from the API with filters
-//   const fetchData = async () => {
-//     try {
-//       const queryParams = buildQueryParams();
-//       const response = await axios.get(
-//         `http://localhost:7779/departments?${queryParams}`
-//       );
-//       setData(response.data);
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     }
-//   };
-
-//   // Fetch data when filters change
-//   useEffect(() => {
-//     fetchData();
-//   }, [filters]);
-
-//   const handleFilterChange = (filterKey, values) => {
-//     setFilters((prev) => ({ ...prev, [filterKey]: values }));
-//   };
-
-//   return (
-//     <div style={{ padding: "20px" }}>
-//       <Button variant="contained" onClick={() => setDrawerOpen(true)}>
-//         Open Filters
-//       </Button>
-//       <Drawer
-//         anchor="right"
-//         open={drawerOpen}
-//         onClose={() => setDrawerOpen(false)}
-//       >
-//         <Box p={3} width="300px" role="presentation">
-//           <h3>Filters</h3>
-//           <Autocomplete
-//             multiple
-//             options={["HR", "Engineering"]}
-//             onChange={(e, value) => handleFilterChange("department", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Department" />
-//             )}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["New York", "San Francisco", "Los Angeles"]}
-//             onChange={(e, value) => handleFilterChange("location", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Location" />
-//             )}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["Active", "Inactive"]}
-//             onChange={(e, value) => handleFilterChange("status", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Status" />
-//             )}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["Manager", "Engineer", "Recruiter", "HR Specialist"]}
-//             onChange={(e, value) => handleFilterChange("role", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Filter by Role" />
-//             )}
-//           />
-//           <TextField
-//             label="Filter by Date (After)"
-//             type="date"
-//             InputLabelProps={{ shrink: true }}
-//             onChange={(e) => handleFilterChange("date", e.target.value)}
-//             fullWidth
-//             style={{ marginTop: "20px" }}
-//           />
-//           <Button
-//             variant="outlined"
-//             fullWidth
-//             style={{ marginTop: "20px" }}
-//             onClick={() => setDrawerOpen(false)}
-//           >
-//             Apply Filters
-//           </Button>
-//         </Box>
-//       </Drawer>
-//       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>ID</TableCell>
-//               <TableCell>Name</TableCell>
-//               <TableCell>Department</TableCell>
-//               <TableCell>Location</TableCell>
-//               <TableCell>Status</TableCell>
-//               <TableCell>Role</TableCell>
-//               <TableCell>Date</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {data.length > 0 ? (
-//               data.map((row) => (
-//                 <TableRow key={row.id}>
-//                   <TableCell>{row.id}</TableCell>
-//                   <TableCell>{row.name}</TableCell>
-//                   <TableCell>{row.department}</TableCell>
-//                   <TableCell>{row.location}</TableCell>
-//                   <TableCell>{row.status}</TableCell>
-//                   <TableCell>{row.role}</TableCell>
-//                   <TableCell>{row.date}</TableCell>
-//                 </TableRow>
-//               ))
-//             ) : (
-//               <TableRow>
-//                 <TableCell colSpan={7} align="center">
-//                   No matching data
-//                 </TableCell>
-//               </TableRow>
-//             )}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-//     </div>
-//   );
-// }
-
-// export default DepartmentTableWithFilters;
-
-// import React, { useState, useEffect } from "react";
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableContainer,
-//   TableHead,
-//   TableRow,
-//   TextField,
-//   Autocomplete,
-//   Paper,
-//   Button,
-//   Drawer,
-//   Box,
-// } from "@mui/material";
-// import axios from "axios";
-
-// function DepartmentTableWithFilters() {
-//   const [filters, setFilters] = useState({
-//     department: [],
-//     location: [],
-//     status: [],
-//     role: [],
-//     date: null,
-//   });
-//   console.log(filters, "FData");
-//   const [data, setData] = useState([]);
-//   const [drawerOpen, setDrawerOpen] = useState(false);
-
-//   // Build query string from filters
-//   const buildQueryParams = () => {
-//     const params = new URLSearchParams();
-//     Object.entries(filters).forEach(([key, value]) => {
-//       if (Array.isArray(value) && value.length > 0) {
-//         params.append(key, value.join(","));
-//       } else if (value) {
-//         params.append(key, value);
-//       }
-//     });
-//     return params.toString();
-//   };
-
-//   // Fetch data from the API with filters
-//   const fetchData = async () => {
-//     try {
-//       const queryString = buildQueryParams();
-//       const response = await axios.get(
-//         `http://localhost:7779/departments?${queryString}`
-//       );
-//       setData(response.data);
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     }
-//   };
-
-//   // Update data when filters change
-//   useEffect(() => {
-//     fetchData();
-//   }, [filters]);
-
-//   const handleFilterChange = (filterKey, values) => {
-//     setFilters((prev) => ({ ...prev, [filterKey]: values }));
-//   };
-
-//   return (
-//     <div style={{ padding: "20px" }}>
-//       <Button variant="contained" onClick={() => setDrawerOpen(true)}>
-//         Open Filters
-//       </Button>
-//       <Drawer
-//         anchor="right"
-//         open={drawerOpen}
-//         onClose={() => setDrawerOpen(false)}
-//       >
-//         <Box p={3} width="300px" role="presentation">
-//           <h3>Filters</h3>
-//           <Autocomplete
-//             multiple
-//             options={["HR", "Engineering"]}
-//             onChange={(e, value) => handleFilterChange("department", value)}
-//             renderInput={(params) => (
-//               <TextField {...params} label="Department" />
-//             )}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["New York", "San Francisco", "Los Angeles"]}
-//             onChange={(e, value) => handleFilterChange("location", value)}
-//             renderInput={(params) => <TextField {...params} label="Location" />}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["Active", "Inactive"]}
-//             onChange={(e, value) => handleFilterChange("status", value)}
-//             renderInput={(params) => <TextField {...params} label="Status" />}
-//           />
-//           <Autocomplete
-//             multiple
-//             options={["Manager", "Engineer", "Recruiter", "HR Specialist"]}
-//             onChange={(e, value) => handleFilterChange("role", value)}
-//             renderInput={(params) => <TextField {...params} label="Role" />}
-//           />
-//           <TextField
-//             label="Date (After)"
-//             type="date"
-//             InputLabelProps={{ shrink: true }}
-//             onChange={(e) => handleFilterChange("date", e.target.value)}
-//             fullWidth
-//             style={{ marginTop: "20px" }}
-//           />
-//           <Button
-//             variant="outlined"
-//             fullWidth
-//             style={{ marginTop: "20px" }}
-//             onClick={() => setDrawerOpen(false)}
-//           >
-//             Apply Filters
-//           </Button>
-//         </Box>
-//       </Drawer>
-//       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>ID</TableCell>
-//               <TableCell>Name</TableCell>
-//               <TableCell>Department</TableCell>
-//               <TableCell>Location</TableCell>
-//               <TableCell>Status</TableCell>
-//               <TableCell>Role</TableCell>
-//               <TableCell>Date</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {data.length > 0 ? (
-//               data.map((row) => (
-//                 <TableRow key={row.id}>
-//                   <TableCell>{row.id}</TableCell>
-//                   <TableCell>{row.name}</TableCell>
-//                   <TableCell>{row.department}</TableCell>
-//                   <TableCell>{row.location}</TableCell>
-//                   <TableCell>{row.status}</TableCell>
-//                   <TableCell>{row.role}</TableCell>
-//                   <TableCell>{row.date}</TableCell>
-//                 </TableRow>
-//               ))
-//             ) : (
-//               <TableRow>
-//                 <TableCell colSpan={7} align="center">
-//                   No matching data
-//                 </TableCell>
-//               </TableRow>
-//             )}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-//     </div>
-//   );
-// }
-
-// export default DepartmentTableWithFilters;
+export default MyTable;

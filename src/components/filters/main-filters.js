@@ -3,6 +3,7 @@ import MultiSelectTable from "./filter1";
 import { Box, Card } from "@mui/material";
 import ChipFilterTable from "./filter2";
 import TableWithDrawerFilters from "./filter3";
+import MyTable from "./filter4";
 // import DepartmentTableWithFilters from "./filter4";
 
 const MainFilters = () => {
@@ -14,6 +15,7 @@ const MainFilters = () => {
             <MultiSelectTable />
             <ChipFilterTable />
             <TableWithDrawerFilters />
+            <MyTable />
           </Box>
         </Card>
       </Box>
