@@ -170,7 +170,7 @@
 
 // export default FilterDrawer;
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -185,6 +185,7 @@ import {
 } from "@mui/material";
 import DateRangeFilter from "./date-range-filter";
 import FilterComponent from "./combined-filters";
+import FilterExampleComponent from "./member-filter";
 
 const FilterDrawer = (props) => {
   const {
@@ -200,6 +201,11 @@ const FilterDrawer = (props) => {
     handleCitySelect,
     handleProfessionSelect,
   } = props;
+
+  const [memberFilters, setMemberFilters] = useState([
+    { field: "member", condition: "Is", value: "" },
+    { field: "fatherName", condition: "Is", value: "" },
+  ]);
 
   return (
     <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
@@ -243,6 +249,15 @@ const FilterDrawer = (props) => {
                 }))
               }
             />
+          </Grid>
+          {/* Member Filter */}
+          <Grid item xs={12}>
+            <FilterExampleComponent
+              filters={memberFilters}
+              setFilters={setMemberFilters}
+            />
+          </Grid>
+          <Grid item xs={12}>
             <Box textAlign={"center"}>
               {customFilters.filterCondition === "all" ? (
                 <Typography>

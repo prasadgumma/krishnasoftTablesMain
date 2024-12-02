@@ -12,7 +12,6 @@ import {
   TextField,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material"; // Import icons
-import TableDropdown from "./table-dropdown";
 import { DataGrid } from "@mui/x-data-grid";
 import CreatedAtColumn from "./created-at-table";
 import { v4 as uuidv4 } from "uuid";
@@ -20,8 +19,9 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import FilterDrawer from "./filter-drawer";
 import FilterComponent from "./combined-filters";
+import TableBottomActions from "./bottom-table-actions";
 
-const MembersTable = () => {
+const SafeTripTable = () => {
   const [data, setData] = useState([]);
   const [checkedBox, setCheckedBox] = useState(true);
   const [paginationModel, setPaginationModel] = useState({
@@ -34,6 +34,9 @@ const MembersTable = () => {
   const [loading, setLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const toggleDrawer = () => setOpenDrawer(!openDrawer);
+  const [status, setStatus] = useState("1");
+  const [searchType, setSearchType] = useState("");
+  const [checkDate, setCheckDate] = useState("2");
 
   const [customFilters, setCustomFilters] = useState({
     member: "",
@@ -48,6 +51,18 @@ const MembersTable = () => {
     dateOption: "",
     exactDate: null,
   });
+
+  const sendStatus = (data) => {
+    setStatus(data);
+    console.log(data, "Data");
+  };
+
+  const sendSearchType = (data) => {
+    setSearchType(data);
+  };
+  const sendCheckedDate = (data) => {
+    setCheckDate(data);
+  };
 
   const [selectedColumns] = useState({
     id: true,
@@ -64,99 +79,119 @@ const MembersTable = () => {
     status: true,
     action: true,
   });
-
+  console.log(data);
   const columns = [
     { field: "id", headerName: "ID", width: 70, hide: !selectedColumns.id },
     {
-      field: "member",
-      headerName: "Member",
-      filterable: true,
-      width: 150,
-      hide: !selectedColumns.member,
+      field: "tripid",
+      headerName: "Trip ID",
+      width: 70,
+      hide: !selectedColumns.id,
     },
-    CreatedAtColumn({ field: "createdAt" }),
+
+    // CreatedAtColumn({ field: "createdAt" }),
     {
-      field: "age",
+      field: "mob",
       type: "number",
-      headerName: "Age",
+      headerName: "Mobile",
       width: 90,
-      hide: !selectedColumns.age,
+      //   hide: !selectedColumns.age,
       sortable: true,
     },
     {
-      field: "education",
-      headerName: "Education",
+      field: "tname",
+      headerName: "Name",
+      filterable: true,
+      width: 150,
+      //   hide: !selectedColumns.member,
+    },
+    {
+      field: "gend",
+      headerName: "Gender",
       width: 130,
-      hide: !selectedColumns.education,
+      //   hide: !selectedColumns.education,
     },
     {
-      field: "fatherName",
-      headerName: "Father's Name",
+      field: "vno",
+      headerName: "Vehicle",
       width: 150,
-      hide: !selectedColumns.fatherName,
+      //   hide: !selectedColumns.fatherName,
     },
-    {
-      field: "motherName",
-      headerName: "Mother's Name",
-      width: 150,
-      hide: !selectedColumns.motherName,
-    },
-    {
-      field: "husbandName",
-      headerName: "Husband's Name",
-      width: 150,
-      hide: !selectedColumns.husbandName,
-    },
-    {
-      field: "city",
-      headerName: "City",
-      width: 100,
-      hide: !selectedColumns.city,
-    },
-    {
-      field: "profession",
-      headerName: "Profession",
-      width: 130,
-      hide: !selectedColumns.profession,
-    },
-    {
-      field: "description",
-      headerName: "Description",
-      width: 200,
-      hide: !selectedColumns.description,
-    },
-    // {
-    //   field: "status",
-    //   headerName: "Status",
-    //   width: 100,
-    //   hide: !selectedColumns.status,
-    //   renderCell: (params) => (params.row.isEnabled ? "Enabled" : "Disabled"),
-    // },
 
     {
-      field: "status",
-      headerName: "Status",
+      field: "dest",
+      headerName: "Destination",
+      width: 150,
+      //   hide: !selectedColumns.motherName,
+    },
+    {
+      field: "triptypnm",
+      headerName: "Trip Type",
+      width: 150,
+      //   hide: !selectedColumns.husbandName,
+    },
+    {
+      field: "livsts",
+      headerName: "Trip Status",
       width: 100,
-      hide: !selectedColumns.status,
+      //   hide: !selectedColumns.status,
       renderCell: (params) => (
         <Typography
           sx={{
-            backgroundColor: params.row.isEnabled ? "#4caf50" : "#f44336", // Green for enabled, red for disabled
+            backgroundColor: params.row.livsts === 1 ? "#4caf50" : "#f44336", // Green for enabled, red for disabled
             color: "white",
             padding: "2px 6px",
             borderRadius: "4px",
             display: "inline-block", // Ensures the background fits the text
           }}
         >
-          {params.row.isEnabled ? "Enabled" : "Disabled"}
+          {params.row.livsts === 1 ? "Started" : "End"}
         </Typography>
       ),
     },
     {
+      field: "stm",
+      headerName: "Start Time",
+      width: 100,
+      //   hide: !selectedColumns.city,
+    },
+    {
+      field: "etm",
+      headerName: "End Time",
+      width: 130,
+      //   hide: !selectedColumns.profession,
+    },
+    {
+      field: "tripenddispnm",
+      headerName: "End Disposition",
+      width: 200,
+      //   hide: !selectedColumns.description,
+    },
+    {
+      field: "'tripendesc",
+      headerName: "End Discription",
+      width: 100,
+      hide: !selectedColumns.status,
+      //   renderCell: (params) => (params.row.isEnabled ? "Enabled" : "Disabled"),
+    },
+    {
+      field: "trip_dur_mins",
+      headerName: "Duration(Mins)",
+      width: 100,
+      //   hide: !selectedColumns.status,
+    },
+    {
+      field: "'lastloctm",
+      headerName: "Last Sync",
+      width: 100,
+      //   hide: !selectedColumns.status,
+    },
+
+    {
       field: "action",
       headerName: "Actions",
       width: 150,
-      hide: !selectedColumns.action,
+      //   hide: !selectedColumns.action,
       renderCell: (params) => (
         <Box>
           <IconButton
@@ -186,31 +221,27 @@ const MembersTable = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
+        console.log(checkDate);
         const { page, pageSize } = paginationModel;
         const start = page * pageSize;
         const end = (page + 1) * pageSize;
-        const response = await axios.get("http://localhost:7779/members", {
-          params: {
-            _page: page + 1, // Assuming your API expects 1-based page index
-            _limit: 25,
-            _start: start,
-            _end: end,
-            _search: searchQuery,
-          },
-        });
-        const overAllData = response.data.map((member) => {
-          // Use localStorage or state to persist createdAt
-          const existingCreatedAt =
-            member.createdAt || localStorage.getItem(`createdAt_${member.id}`);
-          const createdAt = existingCreatedAt || new Date().toISOString();
-
-          // Store the createdAt value in localStorage (or any persistent storage)
-          if (!existingCreatedAt) {
-            localStorage.setItem(`createdAt_${member.id}`, createdAt);
+        const response = await axios.post(
+          "http://192.168.21.71/devenv/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
+          {
+            lml: "966d65ba160b45dcbdb8978e9c0c8a03",
+            dt: "02-12-2024/15-01-2025",
+            tripsts: status,
+            chkdt: checkDate,
+            srch: "",
+            stype: searchType,
           }
-
-          return { ...member, createdAt };
-        });
+        );
+        console.log(response.data.resp.trips_list, "Res");
+        const overAllData = response.data.resp.trips_list.map(
+          (member, index) => {
+            return { ...member, id: index + 1 };
+          }
+        );
 
         setData(overAllData);
         setAllFilterData(overAllData);
@@ -220,106 +251,88 @@ const MembersTable = () => {
     };
 
     fetchMembers();
-  }, [paginationModel, searchQuery]); // Dependency array ensures the effect is run whenever paginationModel changes
+  }, [paginationModel, searchQuery, status, checkDate, searchType]); // Dependency array ensures the effect is run whenever paginationModel changes
 
-  const filteredData = data.filter((row) => {
-    const { fromDate, toDate, dateOption, exactDate } = filter;
-    const { member, age, ageCondition, filterCondition } = customFilters;
+  //   const filteredData = data.filter((row) => {
+  //     const { fromDate, toDate, dateOption, exactDate } = filter;
+  //     const { member, age, ageCondition, filterCondition } = customFilters;
 
-    // Normalize createdAt for date filters
-    const createdAtDate = dayjs(row.createdAt);
-    const today = dayjs();
+  //     // Normalize createdAt for date filters
+  //     const createdAtDate = dayjs(row.createdAt);
+  //     const today = dayjs();
 
-    const normalizeDate = (date) => {
-      const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    };
+  //     const normalizeDate = (date) => {
+  //       const d = new Date(date);
+  //       d.setHours(0, 0, 0, 0);
+  //       return d;
+  //     };
 
-    // Check date range
-    let passesDateFilter = true;
+  //     // Check date range
+  //     let passesDateFilter = true;
 
-    switch (dateOption) {
-      // case "today":
-      //   passesDateFilter = createdAtDate.isSame(today, "day");
-      //   break;
-      // case "exactDate":
-      //   passesDateFilter = exactDate
-      //     ? createdAtDate.isSame(normalizeDate(exactDate), "day")
-      //     : true;
-      //   break;
-      // case "beforeDate":
-      //   passesDateFilter = fromDate
-      //     ? createdAtDate.isBefore(normalizeDate(fromDate), "day")
-      //     : true;
-      //   break;
-      // case "afterDate":
-      //   passesDateFilter = toDate
-      //     ? createdAtDate.isAfter(normalizeDate(toDate), "day")
-      //     : true;
-      //   break;
-      default:
-        if (fromDate && toDate) {
-          const startDate = normalizeDate(fromDate);
-          const endDate = normalizeDate(toDate);
-          passesDateFilter =
-            createdAtDate >= startDate && createdAtDate <= endDate;
-        } else if (fromDate) {
-          const startDate = normalizeDate(fromDate);
-          passesDateFilter = createdAtDate >= startDate;
-        } else if (toDate) {
-          const endDate = normalizeDate(toDate);
-          passesDateFilter = createdAtDate <= endDate;
-        }
-    }
-    // Check member filter
-    const matchesMember = member
-      ? row.member.toLowerCase().includes(member.toLowerCase())
-      : true;
+  //     switch (dateOption) {
+  //       default:
+  //         if (fromDate && toDate) {
+  //           const startDate = normalizeDate(fromDate);
+  //           const endDate = normalizeDate(toDate);
+  //           passesDateFilter =
+  //             createdAtDate >= startDate && createdAtDate <= endDate;
+  //         } else if (fromDate) {
+  //           const startDate = normalizeDate(fromDate);
+  //           passesDateFilter = createdAtDate >= startDate;
+  //         } else if (toDate) {
+  //           const endDate = normalizeDate(toDate);
+  //           passesDateFilter = createdAtDate <= endDate;
+  //         }
+  //     }
+  //     // Check member filter
+  //     const matchesMember = member
+  //       ? row.member.toLowerCase().includes(member.toLowerCase())
+  //       : true;
 
-    // Apply age condition
-    const ageValue = parseInt(age, 10);
-    let matchesAge = true;
-    if (age && !isNaN(ageValue)) {
-      switch (ageCondition) {
-        case "<":
-          matchesAge = row.age < ageValue;
-          break;
-        case ">":
-          matchesAge = row.age > ageValue;
-          break;
-        case "<=":
-          matchesAge = row.age <= ageValue;
-          break;
-        case ">=":
-          matchesAge = row.age >= ageValue;
-          break;
-        case "=":
-          matchesAge = row.age === ageValue;
-          break;
-        case "!=":
-          matchesAge = row.age !== ageValue;
-          break;
-        default:
-          matchesAge = false; // Default to match all if no condition selected
-      }
-    }
+  //     // Apply age condition
+  //     const ageValue = parseInt(age, 10);
+  //     let matchesAge = true;
+  //     if (age && !isNaN(ageValue)) {
+  //       switch (ageCondition) {
+  //         case "<":
+  //           matchesAge = row.age < ageValue;
+  //           break;
+  //         case ">":
+  //           matchesAge = row.age > ageValue;
+  //           break;
+  //         case "<=":
+  //           matchesAge = row.age <= ageValue;
+  //           break;
+  //         case ">=":
+  //           matchesAge = row.age >= ageValue;
+  //           break;
+  //         case "=":
+  //           matchesAge = row.age === ageValue;
+  //           break;
+  //         case "!=":
+  //           matchesAge = row.age !== ageValue;
+  //           break;
+  //         default:
+  //           matchesAge = false; // Default to match all if no condition selected
+  //       }
+  //     }
 
-    // Apply AND or OR logic based on filterCondition
-    const passesCustomFilter =
-      filterCondition === "all"
-        ? matchesMember && matchesAge // AND condition
-        : matchesMember || matchesAge; // OR condition
+  //     // Apply AND or OR logic based on filterCondition
+  //     const passesCustomFilter =
+  //       filterCondition === "all"
+  //         ? matchesMember && matchesAge // AND condition
+  //         : matchesMember || matchesAge; // OR condition
 
-    return passesDateFilter && passesCustomFilter;
-  });
+  //     return passesDateFilter && passesCustomFilter;
+  //   });
 
   const resetData = () => {
     setAllFilterData(data); // Restore to the unfiltered data set
   };
-  const applyHandler = () => {
-    setAllFilterData(filteredData);
-  };
+  //   const applyHandler = () => {
+  //     setAllFilterData(filteredData);
+  //   };
 
   const deleteHandle = (id) => {
     if (window.confirm("Would you like to delete this row?")) {
@@ -462,17 +475,8 @@ const MembersTable = () => {
                   fontFamily={"serif"}
                   width={"18%"}
                 >
-                  Members Table
+                  Trip List Reports
                 </Typography>
-
-                {/* <FilterComponent
-                  handleCitySelect={handleCitySelect}
-                  handleProfessionSelect={handleProfessionSelect}
-                  handleClearCitySelection={() => handleCitySelect("")}
-                  handleClearProfessionSelection={() =>
-                    handleProfessionSelect("")
-                  }
-                /> */}
               </Box>
               <Box p={2}>
                 <Grid
@@ -532,7 +536,7 @@ const MembersTable = () => {
                 </Grid>
 
                 <DataGrid
-                  rows={allFilterData}
+                  rows={data}
                   columns={columns}
                   checkboxSelection
                   disableSelectionOnClick={false}
@@ -549,7 +553,7 @@ const MembersTable = () => {
                   pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
                   rowCount={300} // Make sure this reflects the total number of members
                   onPaginationModelChange={handlePaginationChange}
-                  paginationMode="server" // Client-side pagination
+                  paginationMode="client" // Client-side pagination
                   loading={loading}
                   sx={{
                     height: 600, // Set a fixed height
@@ -605,14 +609,14 @@ const MembersTable = () => {
                 >
                   <span>
                     Selected Rows:{" "}
-                    <strong>
+                    {/* <strong>
                       {globalSelectedRows.length === data.length
                         ? "SelectedAll"
                         : globalSelectedRows.length}
-                    </strong>
+                    </strong> */}
                   </span>
                   <span>
-                    Total Rows: <strong>{data.length}</strong>
+                    {/* Total Rows: <strong>{data.length}</strong> */}
                   </span>
                 </Box>
               </Box>
@@ -654,7 +658,7 @@ const MembersTable = () => {
                     Cancel
                   </Button>
                   <Box mb={0.5}>
-                    <TableDropdown />
+                    <TableBottomActions />
                   </Box>
 
                   <Box display={"flex"} mt={1} mb={1}>
@@ -688,15 +692,18 @@ const MembersTable = () => {
           filter={filter}
           setFilter={setFilter}
           data={data}
-          applyHandler={applyHandler}
+          //   applyHandler={applyHandler}
           setData={setData}
           resetData={resetData} // Pass the reset function
           handleProfessionSelect={handleProfessionSelect}
           handleCitySelect={handleCitySelect}
+          sendStatus={sendStatus}
+          sendSearchType={sendSearchType}
+          sendCheckedDate={sendCheckedDate}
         />
       </Box>
     </LocalizationProvider>
   );
 };
 
-export default MembersTable;
+export default SafeTripTable;

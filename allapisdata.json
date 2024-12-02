@@ -12,7 +12,8 @@
       "city": "Chicago",
       "profession": "Scientist",
       "description": "Research Scientist America",
-      "isEnabled": true
+      "isEnabled": true,
+      "status": "Disabled"
     },
     {
       "id": "2",
@@ -68,7 +69,8 @@
       "city": "Dallas",
       "profession": "Consultant",
       "description": "Business Consultant",
-      "isEnabled": false
+      "isEnabled": false,
+      "status": "Disabled"
     },
     {
       "id": "6",
@@ -2618,7 +2620,8 @@
       "Location": "New York",
       "Status": "Active",
       "Role": "Software Engineer",
-      "Date": "2024-11-01"
+      "Date": "2024-11-01",
+      "id": "d85b"
     },
     {
       "ID": 2,
@@ -2627,7 +2630,8 @@
       "Location": "San Francisco",
       "Status": "Inactive",
       "Role": "Marketing Manager",
-      "Date": "2024-11-02"
+      "Date": "2024-11-02",
+      "id": "498e"
     },
     {
       "ID": 3,
@@ -2636,7 +2640,8 @@
       "Location": "Chicago",
       "Status": "Active",
       "Role": "Financial Analyst",
-      "Date": "2024-11-03"
+      "Date": "2024-11-03",
+      "id": "b9d6"
     },
     {
       "ID": 4,
@@ -2645,7 +2650,8 @@
       "Location": "Dallas",
       "Status": "Active",
       "Role": "HR Specialist",
-      "Date": "2024-11-04"
+      "Date": "2024-11-04",
+      "id": "23df"
     },
     {
       "ID": 5,
@@ -2654,7 +2660,8 @@
       "Location": "Boston",
       "Status": "Active",
       "Role": "Operations Manager",
-      "Date": "2024-11-05"
+      "Date": "2024-11-05",
+      "id": "e9ea"
     },
     {
       "ID": 6,
@@ -2663,7 +2670,8 @@
       "Location": "Seattle",
       "Status": "Inactive",
       "Role": "DevOps Engineer",
-      "Date": "2024-11-06"
+      "Date": "2024-11-06",
+      "id": "ebad"
     },
     {
       "ID": 7,
@@ -2672,7 +2680,8 @@
       "Location": "Atlanta",
       "Status": "Active",
       "Role": "Sales Representative",
-      "Date": "2024-11-07"
+      "Date": "2024-11-07",
+      "id": "842b"
     },
     {
       "ID": 8,
@@ -2681,7 +2690,8 @@
       "Location": "Austin",
       "Status": "Active",
       "Role": "Backend Developer",
-      "Date": "2024-11-08"
+      "Date": "2024-11-08",
+      "id": "97ba"
     },
     {
       "ID": 9,
@@ -2690,7 +2700,8 @@
       "Location": "Los Angeles",
       "Status": "Inactive",
       "Role": "Content Specialist",
-      "Date": "2024-11-09"
+      "Date": "2024-11-09",
+      "id": "28b1"
     },
     {
       "ID": 10,
@@ -2699,7 +2710,8 @@
       "Location": "Miami",
       "Status": "Active",
       "Role": "Accountant",
-      "Date": "2024-11-10"
+      "Date": "2024-11-10",
+      "id": "8ef8"
     },
     {
       "ID": 11,
@@ -2708,7 +2720,8 @@
       "Location": "Denver",
       "Status": "Active",
       "Role": "Frontend Developer",
-      "Date": "2024-11-11"
+      "Date": "2024-11-11",
+      "id": "c92a"
     },
     {
       "ID": 12,
@@ -2717,7 +2730,8 @@
       "Location": "Houston",
       "Status": "Active",
       "Role": "Recruiter",
-      "Date": "2024-11-12"
+      "Date": "2024-11-12",
+      "id": "af23"
     },
     {
       "ID": 13,
@@ -2726,7 +2740,8 @@
       "Location": "Philadelphia",
       "Status": "Inactive",
       "Role": "Logistics Coordinator",
-      "Date": "2024-11-13"
+      "Date": "2024-11-13",
+      "id": "e741"
     },
     {
       "ID": 14,
@@ -2735,7 +2750,8 @@
       "Location": "Phoenix",
       "Status": "Active",
       "Role": "Sales Manager",
-      "Date": "2024-11-14"
+      "Date": "2024-11-14",
+      "id": "b565"
     },
     {
       "ID": 15,
@@ -2744,7 +2760,8 @@
       "Location": "San Diego",
       "Status": "Active",
       "Role": "UI/UX Designer",
-      "Date": "2024-11-15"
+      "Date": "2024-11-15",
+      "id": "8ef9"
     }
   ]
 }
