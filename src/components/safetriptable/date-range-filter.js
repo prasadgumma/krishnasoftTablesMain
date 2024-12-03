@@ -4,13 +4,25 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
-const DateRangeFilter = ({ filter, setFilter }) => {
+const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
+  // Handle From Date change
+  console.log(dayjs(dateFilter.fromDate));
+  console.log(dateFilter.fromDate);
   const handleFromDateChange = (newValue) => {
-    setFilter((prev) => ({ ...prev, fromDate: newValue }));
+    const formattedDate = newValue
+      ? dayjs(newValue).format("DD-MM-YYYY")
+      : null;
+    console.log(formattedDate, "Date");
+    setDateFilter((prev) => ({ ...prev, fromDate: formattedDate }));
   };
 
+  // Handle To Date change
   const handleToDateChange = (newValue) => {
-    setFilter((prev) => ({ ...prev, toDate: newValue }));
+    const formattedDate = newValue
+      ? dayjs(newValue).format("DD-MM-YYYY")
+      : null;
+    console.log(newValue?.toISOString(), "New Value");
+    setDateFilter((prev) => ({ ...prev, toDate: formattedDate }));
   };
 
   return (
@@ -21,7 +33,12 @@ const DateRangeFilter = ({ filter, setFilter }) => {
           {/* From Date Picker */}
           <DatePicker
             label="From Date"
-            value={filter.fromDate ? dayjs(filter.fromDate) : null}
+            value={
+              dateFilter.fromDate
+                ? dayjs(dateFilter.fromDate, "DD-MM-YYYY")
+                : null
+            } // Parse ISO string
+            format="DD-MM-YYYY"
             onChange={handleFromDateChange}
             renderInput={(params) => (
               <TextField
@@ -47,7 +64,10 @@ const DateRangeFilter = ({ filter, setFilter }) => {
           {/* To Date Picker */}
           <DatePicker
             label="To Date"
-            value={filter.toDate ? dayjs(filter.toDate) : null}
+            value={
+              dateFilter.toDate ? dayjs(dateFilter.toDate, "DD-MM-YYYY") : null
+            } // Parse ISO string
+            format="DD-MM-YYYY"
             onChange={handleToDateChange}
             renderInput={(params) => (
               <TextField

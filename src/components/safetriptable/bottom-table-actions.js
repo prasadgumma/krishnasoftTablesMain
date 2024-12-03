@@ -2,71 +2,94 @@ import React, { useState } from "react";
 import { FormControl, InputLabel, MenuItem, Select, Grid } from "@mui/material";
 
 export const columns = [
-  { field: "id", headerName: "ID", width: 70 },
   {
-    field: "member",
-    headerName: "Member",
-    filterable: true,
-    width: 150,
+    field: "id",
+    headerName: "S.No",
+    width: 70,
   },
-  // CreatedAtColumn({ field: "createdAt" }),
   {
-    field: "age",
+    field: "tripid",
+    headerName: "Trip ID",
+    width: 70,
+  },
+
+  {
+    field: "mob",
     type: "number",
-    headerName: "Age",
+    headerName: "Mobile",
     width: 90,
 
     sortable: true,
   },
   {
-    field: "education",
-    headerName: "Education",
+    field: "tname",
+    headerName: "Name",
+    filterable: true,
+    width: 150,
+  },
+  {
+    field: "gend",
+    headerName: "Gender",
     width: 130,
   },
   {
-    field: "fatherName",
-    headerName: "Father's Name",
+    field: "vno",
+    headerName: "Vehicle",
+    width: 150,
+  },
+
+  {
+    field: "dest",
+    headerName: "Destination",
     width: 150,
   },
   {
-    field: "motherName",
-    headerName: "Mother's Name",
+    field: "triptypnm",
+    headerName: "Trip Type",
     width: 150,
   },
   {
-    field: "husbandName",
-    headerName: "Husband's Name",
-    width: 150,
-  },
-  {
-    field: "city",
-    headerName: "City",
+    field: "livsts",
+    headerName: "Trip Status",
     width: 100,
   },
   {
-    field: "profession",
-    headerName: "Profession",
+    field: "stm",
+    headerName: "Start Time",
+    width: 100,
+  },
+  {
+    field: "etm",
+    headerName: "End Time",
     width: 130,
   },
   {
-    field: "description",
-    headerName: "Description",
+    field: "tripenddispnm",
+    headerName: "End Disposition",
     width: 200,
   },
   {
-    field: "status",
-    headerName: "Status",
+    field: "tripendesc",
+    headerName: "End Discription",
     width: 100,
-
-    renderCell: (params) => (params.row.isEnabled ? "Enabled" : "Disabled"),
   },
+  {
+    field: "trip_dur_mins",
+    headerName: "Duration(Mins)",
+    width: 100,
+  },
+  {
+    field: "lastloctm",
+    headerName: "Last Sync",
+    width: 100,
+  },
+
   {
     field: "action",
     headerName: "Actions",
     width: 150,
   },
 ];
-
 const TableBottomActions = () => {
   const [selectedValue, setSelectedValue] = useState("");
   const [secondDropdownVisible, setSecondDropdownVisible] = useState(false);
@@ -82,7 +105,7 @@ const TableBottomActions = () => {
     }
 
     // Show second dropdown when "Item 1" is selected
-    if (value === "member") {
+    if (value === "tripid") {
       setSecondDropdownVisible(true);
     } else {
       setSecondDropdownVisible(false); // Hide it if another item is selected
@@ -127,11 +150,6 @@ const TableBottomActions = () => {
             }}
             label="Select Item"
           >
-            {/* {[...Array(10)].map((_, index) => (
-              <MenuItem key={index} value={`Item ${index + 1}`}>
-                Item {index + 1}
-              </MenuItem>
-            ))} */}
             {columns.map((column, index) => (
               <MenuItem key={index} value={column.field}>
                 {column.headerName}
