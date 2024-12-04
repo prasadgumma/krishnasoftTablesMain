@@ -29,7 +29,7 @@ const FilterDrawer = (props) => {
   const [searchType, setSearchType] = useState("");
   const [searchText, setSearchText] = useState("");
   const [checkDate, setCheckDate] = useState("2");
-  console.log(dateFilter, "dateFilter");
+  // console.log(dateFilter, "dateFilter");
   const handleChangeStatus = (event) => {
     setStatus(event.target.value);
     sendStatus(event.target.value);
@@ -109,7 +109,7 @@ const FilterDrawer = (props) => {
                 label="Status"
                 onChange={handleChangeSearchType}
               >
-                <MenuItem value="">Select Type</MenuItem>
+                <MenuItem value="3">Select Type</MenuItem>
                 <MenuItem value="1">Phone Number</MenuItem>
                 <MenuItem value="2">Trip ID</MenuItem>
               </Select>
@@ -124,7 +124,7 @@ const FilterDrawer = (props) => {
               onChange={handleSearchChange}
               placeholder="Type to search..."
               disabled={
-                searchType === "" // Read-only if Option 1 is selected
+                searchType === "3" // Read-only if Option 1 is selected
               }
             />
           </Grid>

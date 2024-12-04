@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from "uuid";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import FilterDrawer from "./filter-drawer";
 import TableBottomActions from "./bottom-table-actions";
+import dayjs from "dayjs";
 
 const SafeTripTable = () => {
   const [data, setData] = useState([]);
@@ -25,7 +26,6 @@ const SafeTripTable = () => {
     page: 0,
     pageSize: 25,
   });
-  const [searchQuery, setSearchQuery] = useState("");
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -33,16 +33,14 @@ const SafeTripTable = () => {
   const [status, setStatus] = useState("1");
   const [searchType, setSearchType] = useState("");
   const [searchText, setSearchText] = useState("");
-  console.log(searchText, "searchText");
   const [checkDate, setCheckDate] = useState("2");
   const [dateFilter, setDateFilter] = useState({
-    fromDate: "02-12-2024",
-    toDate: "03-12-2024",
+    fromDate: "",
+    toDate: "",
   });
 
   const sendStatus = (data) => {
     setStatus(data);
-    console.log(data, "Data");
   };
 
   const sendSearchType = (data) => {
@@ -186,15 +184,31 @@ const SafeTripTable = () => {
     },
   ];
   console.log(`${dateFilter.fromDate} / ${dateFilter.toDate}`);
+
   useEffect(() => {
-    const fetchMembers = async () => {
+    // Get today's date
+    const today = dayjs().format("DD-MM-YYYY");
+
+    // Get yesterday's date
+    const yesterday = dayjs().subtract(1, "day").format("DD-MM-YYYY");
+    setDateFilter((prev) => ({
+      ...prev,
+      toDate: today,
+      fromDate: yesterday,
+    }));
+
+    // Log the dates to the console
+    console.log("Today's Date:", today);
+    console.log("Yesterday's Date:", yesterday);
+    const fetchTripDetails = async () => {
+      console.log(`${dateFilter.fromDate} / ${dateFilter.toDate}`);
       try {
-        console.log(`${dateFilter.fromDate}/${dateFilter.toDate}`);
         const response = await axios.post(
+          // "http://192.168.21.126/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
           "http://192.168.21.71/devenv/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
           {
-            lml: "966d65ba160b45dcbdb8978e9c0c8a03",
-            dt: `${dateFilter.fromDate}\/${dateFilter.toDate}`,
+            lml: "894951d2ed1a413290f94a33b0dc12df",
+            dt: `${today}\/${yesterday}`,
             tripsts: status,
             chkdt: "2",
             srch: searchText,
@@ -202,29 +216,25 @@ const SafeTripTable = () => {
           }
         );
         console.log(response, "Res");
-        const overAllData = response.data.resp.trips_list.map(
-          (member, index) => {
-            return { ...member, id: index + 1 };
-          }
-        );
-
-        setData(overAllData);
+        const overAllData = response.data.resp.trips_list.map((trip, index) => {
+          return { ...trip, id: index + 1 };
+        });
+        const todatDate = setData(overAllData);
       } catch (error) {
-        console.error("Error fetching members:", error);
+        console.error("Error fetching Trip Details:", error);
       }
     };
 
-    fetchMembers();
+    fetchTripDetails();
   }, []);
 
   const applyHandler = async () => {
     try {
-      console.log(`${dateFilter.fromDate}/${dateFilter.toDate}`);
-
       const response = await axios.post(
+        // "http://192.168.21.126/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
         "http://192.168.21.71/devenv/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
         {
-          lml: "966d65ba160b45dcbdb8978e9c0c8a03",
+          lml: "894951d2ed1a413290f94a33b0dc12df",
           dt: `${dateFilter.fromDate}\/${dateFilter.toDate}`,
           tripsts: status,
           chkdt: checkDate,
@@ -232,9 +242,9 @@ const SafeTripTable = () => {
           stype: searchType,
         }
       );
-      console.log(response, "Res");
-      const overAllData = response.data.resp.trips_list.map((member, index) => {
-        return { ...member, id: index + 1 };
+
+      const overAllData = response.data.resp.trips_list.map((trip, index) => {
+        return { ...trip, id: index + 1 };
       });
 
       setData(overAllData);
@@ -243,6 +253,7 @@ const SafeTripTable = () => {
     }
   };
 
+  // Delete Functionality...
   const deleteHandle = (id) => {
     if (window.confirm("Would you like to delete this row?")) {
       axios.delete(`http://localhost:7779/members/${id}`).then(() => {
@@ -254,6 +265,10 @@ const SafeTripTable = () => {
   const handlePaginationChange = (newPaginationModel) => {
     setPaginationModel(newPaginationModel);
   };
+
+  // const handlePaginationChange = (model) => {
+  //   setPaginationModel(model);
+  // };
 
   // Export to CSV function
   const exportToCSV = () => {
@@ -295,18 +310,19 @@ const SafeTripTable = () => {
   };
 
   const handleSelectionChange = (newSelection) => {
+    console.log(newSelection, "newSelection");
     // Get the rows visible on the current page
-    const visibleRows = data.slice(0, paginationModel.pageSize);
-    // Map visible rows to their IDs
+    const visibleRows = data.slice(
+      paginationModel.page * paginationModel.pageSize,
+      (paginationModel.page + 1) * paginationModel.pageSize
+    );
     const visibleRowIds = visibleRows.map((row) => row.id);
-
     // Filter the selected IDs to include only those in visible rows
     const updatedSelection = newSelection.filter((id) =>
       visibleRowIds.includes(id)
     );
-
-    // Update the global selection with visible rows only
     setGlobalSelectedRows(updatedSelection);
+    // Update the "select all" checkbox state for the current page
     if (visibleRowIds === 25) {
       setCheckedBox(true);
     } else {
@@ -320,6 +336,7 @@ const SafeTripTable = () => {
       const { checked } = eventOrIds.target;
       const allIds = data.map((row) => row.id);
       if (checked) {
+        console.log(checked, "Checked");
         // Select all rows across the filtered data
         setGlobalSelectedRows((prev) =>
           Array.from(new Set([...prev, ...allIds]))
@@ -339,37 +356,15 @@ const SafeTripTable = () => {
       }
     }
   };
+
   const showThebottomButtons = globalSelectedRows.length > 0;
-  console.log(dateFilter, "dateFilter");
   return (
     <LocalizationProvider>
       <Box pb={2}>
         <Grid container spacing={4}>
           <Grid item xs={12}>
             <Card sx={{ height: "100%" }}>
-              <Box
-                mx={2}
-                mt={2}
-                py={1}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-                display={"flex"}
-                gap={6}
-              >
-                <Typography
-                  variant="h5"
-                  color="#787879"
-                  align="left"
-                  fontFamily={"serif"}
-                  width={"18%"}
-                >
-                  Trip List Reports
-                </Typography>
-              </Box>
-              <Box p={2}>
+              <Box p={2} mt={3}>
                 <Grid
                   container
                   spacing={2}
@@ -381,27 +376,16 @@ const SafeTripTable = () => {
                     alignItems="center" // Vertically center the items
                     justifyContent="space-between" // This will push items to the left and right
                   >
-                    <Grid item xs={4} sx={{ ml: "25px", mt: "20px" }}>
-                      <TextField
-                        label="Search"
-                        variant="outlined"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)} // Update the search query state
-                        sx={{
-                          mb: 2.5, // Optional margin for spacing
-                          "& .MuiInputBase-root": {
-                            height: "35px", // Set the height of the input field
-                            padding: "0 8px", // Adjust padding to keep it compact
-                          },
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            height: "45px", // Ensure the outline matches the input field height
-                          },
-                          "& .MuiInputLabel-root": {
-                            top: "-6px", // Adjust label position to be vertically aligned
-                            fontSize: "1rem", // Optional: smaller label text
-                          },
-                        }}
-                      />
+                    <Grid item xs={4} sx={{ ml: "25px", mt: "16px" }}>
+                      <Typography
+                        variant="h5"
+                        color="#787879"
+                        align="left"
+                        fontFamily={"serif"}
+                        width={"50%"}
+                      >
+                        Trip List Reports
+                      </Typography>
                     </Grid>
 
                     <Grid item>
@@ -507,7 +491,7 @@ const SafeTripTable = () => {
                     </strong>
                   </span>
                   <span>
-                    {/* Total Rows: <strong>{data.length}</strong> */}
+                    Total Rows: <strong>{data.length}</strong>
                   </span>
                 </Box>
               </Box>
