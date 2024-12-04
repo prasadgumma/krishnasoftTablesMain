@@ -20,6 +20,7 @@ const FilterDrawer = (props) => {
     dateFilter,
     setDateFilter,
     applyHandler,
+
     sendCheckedDate,
     sendStatus,
     sendSearchType,
@@ -130,14 +131,14 @@ const FilterDrawer = (props) => {
           </Grid>
 
           {/* Action Buttons */}
-          <Grid item xs={6}>
+          <Grid item xs={12} sx={{ textAlign: "center" }}>
             <Button
-              variant="outlined"
+              variant="contained"
               color="primary"
-              fullWidth
               onClick={applyHandler}
+              sx={{ width: "40%" }}
             >
-              Apply Filters
+              Show
             </Button>
           </Grid>
         </Grid>

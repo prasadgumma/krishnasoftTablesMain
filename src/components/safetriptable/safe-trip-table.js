@@ -10,14 +10,17 @@ import {
   IconButton,
   Checkbox,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material"; // Import icons
 import { DataGrid } from "@mui/x-data-grid";
 import { v4 as uuidv4 } from "uuid";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import FilterDrawer from "./filter-drawer";
 import TableBottomActions from "./bottom-table-actions";
 import dayjs from "dayjs";
+import CustomDatePicker from "./custom-date-picker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const SafeTripTable = () => {
   const [data, setData] = useState([]);
@@ -27,7 +30,7 @@ const SafeTripTable = () => {
     pageSize: 25,
   });
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [openDrawer, setOpenDrawer] = useState(false);
   const toggleDrawer = () => setOpenDrawer(!openDrawer);
   const [status, setStatus] = useState("1");
@@ -52,25 +55,32 @@ const SafeTripTable = () => {
   const sendSearchText = (data) => {
     setSearchText(data);
   };
+  const handleDateChange = (id, newValue) => {
+    setData((prevData) =>
+      prevData.map((row) =>
+        row.id === id ? { ...row, stm: newValue?.format("YYYY-MM-DD") } : row
+      )
+    );
+  };
 
   console.log(data);
   const columns = [
     {
       field: "id",
       headerName: "S.No",
-      width: 70,
+      width: 100,
     },
     {
-      field: "tripid",
-      headerName: "Trip ID",
-      width: 70,
+      field: "trip_gen_id",
+      headerName: "Trip Id",
+      width: 150,
     },
 
     {
       field: "mob",
       type: "number",
       headerName: "Mobile",
-      width: 90,
+      width: 150,
 
       sortable: true,
     },
@@ -122,11 +132,13 @@ const SafeTripTable = () => {
         </Typography>
       ),
     },
+
     {
       field: "stm",
       headerName: "Start Time",
-      width: 100,
+      width: 130,
     },
+
     {
       field: "etm",
       headerName: "End Time",
@@ -140,7 +152,7 @@ const SafeTripTable = () => {
     {
       field: "tripendesc",
       headerName: "End Discription",
-      width: 100,
+      width: 200,
     },
     {
       field: "trip_dur_mins",
@@ -184,6 +196,13 @@ const SafeTripTable = () => {
     },
   ];
   console.log(`${dateFilter.fromDate} / ${dateFilter.toDate}`);
+
+  useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000); // Simulates a 2-second API call
+  }, []);
 
   useEffect(() => {
     // Get today's date
@@ -230,6 +249,7 @@ const SafeTripTable = () => {
 
   const applyHandler = async () => {
     try {
+      setLoading(true);
       const response = await axios.post(
         // "http://192.168.21.126/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
         "http://192.168.21.71/devenv/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
@@ -247,7 +267,11 @@ const SafeTripTable = () => {
         return { ...trip, id: index + 1 };
       });
 
+      setOpenDrawer(false);
       setData(overAllData);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Error fetching members:", error);
     }
@@ -265,10 +289,6 @@ const SafeTripTable = () => {
   const handlePaginationChange = (newPaginationModel) => {
     setPaginationModel(newPaginationModel);
   };
-
-  // const handlePaginationChange = (model) => {
-  //   setPaginationModel(model);
-  // };
 
   // Export to CSV function
   const exportToCSV = () => {
@@ -409,69 +429,93 @@ const SafeTripTable = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-
-                <DataGrid
-                  rows={data}
-                  columns={columns}
-                  checkboxSelection
-                  disableSelectionOnClick={false}
-                  rowSelectionModel={globalSelectedRows}
-                  onRowSelectionModelChange={handleSelectionChange}
-                  pagination
-                  pageSize={paginationModel.pageSize}
-                  page={paginationModel.page}
-                  initialState={{
-                    pagination: {
-                      paginationModel: { page: 0, pageSize: 25 },
-                    },
-                  }}
-                  pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
-                  rowCount={data.length} // Make sure this reflects the total number of members
-                  onPaginationModelChange={handlePaginationChange}
-                  paginationMode="client" // Client-side pagination
-                  loading={loading}
+                <Box
                   sx={{
-                    height: 700, // Set a fixed height
-                    width: "100%",
-                    // overflowY: "auto", // Enable vertical scrolling
-                    "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root": {
-                      color: "white",
-                    },
-                    "& .MuiDataGrid-columnHeader": {
-                      backgroundColor: "#787877",
-                      color: "white",
-                      maxHeight: 70,
-                    },
-                    "& .MuiDataGrid-columnHeaderTitle": {
-                      color: "white",
-                    },
-                    "& .MuiDataGrid-columnMenuIcon": {
-                      color: "#fffff !important",
-                    },
-                    "& .MuiDataGrid-menu": {
-                      backgroundColor: "#1976d2",
-                    },
-                    "& .MuiMenuItem-root": {
-                      color: "white",
-                    },
-                    "& .MuiDataGrid-menuItem-root:hover": {
-                      backgroundColor: "#1565c0",
-                    },
-                    "& .MuiDataGrid-sortIcon": {
-                      opacity: 1,
-                      color: "white",
-                    },
-                    "& .MuiDataGrid-menuIconButton": {
-                      opacity: 1,
-                      color: "white",
-                    },
-                    "& .MuiDataGrid-filterIcon": {
-                      opacity: 1,
-                      color: "white",
-                    },
-                  }}
-                />
+                    height: 480, // Set a fixed height for consistent appearance
+                    position: "relative", // Ensures proper placement of the loader
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 15,
+                    borderRadius: "1px",
 
+                    backgroundColor: "#f9f9f9", // Optional background color
+                  }}
+                >
+                  {loading ? (
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      height="100%"
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <DataGrid
+                      rows={data}
+                      columns={columns}
+                      checkboxSelection
+                      disableSelectionOnClick={false}
+                      rowSelectionModel={globalSelectedRows}
+                      onRowSelectionModelChange={handleSelectionChange}
+                      pagination
+                      loading={loading}
+                      pageSize={paginationModel.pageSize}
+                      page={paginationModel.page}
+                      initialState={{
+                        pagination: {
+                          paginationModel: { page: 0, pageSize: 25 },
+                        },
+                      }}
+                      pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
+                      rowCount={data.length} // Make sure this reflects the total number of members
+                      onPaginationModelChange={handlePaginationChange}
+                      paginationMode="client" // Client-side pagination
+                      sx={{
+                        height: 700, // Set a fixed height
+                        width: "100%",
+                        // overflowY: "auto", // Enable vertical scrolling
+                        "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root":
+                          {
+                            color: "white",
+                          },
+                        "& .MuiDataGrid-columnHeader": {
+                          backgroundColor: "#787877",
+                          color: "white",
+                          maxHeight: 70,
+                        },
+                        "& .MuiDataGrid-columnHeaderTitle": {
+                          color: "white",
+                        },
+                        "& .MuiDataGrid-columnMenuIcon": {
+                          color: "#fffff !important",
+                        },
+                        "& .MuiDataGrid-menu": {
+                          backgroundColor: "#1976d2",
+                        },
+                        "& .MuiMenuItem-root": {
+                          color: "white",
+                        },
+                        "& .MuiDataGrid-menuItem-root:hover": {
+                          backgroundColor: "#1565c0",
+                        },
+                        "& .MuiDataGrid-sortIcon": {
+                          opacity: 1,
+                          color: "white",
+                        },
+                        "& .MuiDataGrid-menuIconButton": {
+                          opacity: 1,
+                          color: "white",
+                        },
+                        "& .MuiDataGrid-filterIcon": {
+                          opacity: 1,
+                          color: "white",
+                        },
+                      }}
+                    />
+                  )}
+                </Box>
                 <Box
                   sx={{
                     display: "flex",

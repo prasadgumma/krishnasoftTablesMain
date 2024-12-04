@@ -28,7 +28,9 @@ const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box mb={2}>
-        <Typography gutterBottom>Date Filters</Typography>
+        <Typography gutterBottom mb={2}>
+          Date Filters
+        </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           {/* From Date Picker */}
           <DatePicker
