@@ -55,15 +55,7 @@ const SafeTripTable = () => {
   const sendSearchText = (data) => {
     setSearchText(data);
   };
-  const handleDateChange = (id, newValue) => {
-    setData((prevData) =>
-      prevData.map((row) =>
-        row.id === id ? { ...row, stm: newValue?.format("YYYY-MM-DD") } : row
-      )
-    );
-  };
 
-  console.log(data);
   const columns = [
     {
       field: "id",
@@ -78,7 +70,7 @@ const SafeTripTable = () => {
 
     {
       field: "mob",
-      type: "number",
+      // type: "number",
       headerName: "Mobile",
       width: 150,
 
@@ -185,7 +177,7 @@ const SafeTripTable = () => {
           </IconButton>
           <IconButton
             component={Link}
-            to={`/table/view/member/${params.row.id}`} // View Member route
+            to={`/table/trip/view/${params.row.tripId}`} // View Member route
             color="success" // Use a different color to distinguish it
             sx={{ mr: 1 }}
           >
@@ -215,7 +207,7 @@ const SafeTripTable = () => {
       toDate: today,
       fromDate: yesterday,
     }));
-
+    console.log(dateFilter, "DateFilter");
     // Log the dates to the console
     console.log("Today's Date:", today);
     console.log("Yesterday's Date:", yesterday);
@@ -235,9 +227,11 @@ const SafeTripTable = () => {
           }
         );
         console.log(response, "Res");
-        const overAllData = response.data.resp.trips_list.map((trip, index) => {
-          return { ...trip, id: index + 1 };
-        });
+        const overAllData = response?.data?.resp?.trips_list?.map(
+          (trip, index) => {
+            return { ...trip, id: index + 1 };
+          }
+        );
         const todatDate = setData(overAllData);
       } catch (error) {
         console.error("Error fetching Trip Details:", error);
@@ -263,9 +257,12 @@ const SafeTripTable = () => {
         }
       );
 
-      const overAllData = response.data.resp.trips_list.map((trip, index) => {
-        return { ...trip, id: index + 1 };
-      });
+      const overAllData = response?.data?.resp?.trips_list?.map(
+        (trip, index) => {
+          return { ...trip, id: index + 1 };
+        }
+      );
+      console.log(overAllData, "overAll");
 
       setOpenDrawer(false);
       setData(overAllData);
@@ -436,7 +433,7 @@ const SafeTripTable = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 15,
+                    mt: 8,
                     borderRadius: "1px",
 
                     backgroundColor: "#f9f9f9", // Optional background color
@@ -469,11 +466,11 @@ const SafeTripTable = () => {
                         },
                       }}
                       pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
-                      rowCount={data.length} // Make sure this reflects the total number of members
+                      rowCount={data?.length} // Make sure this reflects the total number of members
                       onPaginationModelChange={handlePaginationChange}
                       paginationMode="client" // Client-side pagination
                       sx={{
-                        height: 700, // Set a fixed height
+                        height: 600, // Set a fixed height
                         width: "100%",
                         // overflowY: "auto", // Enable vertical scrolling
                         "& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root":
@@ -524,18 +521,19 @@ const SafeTripTable = () => {
                     padding: 2,
                     backgroundColor: "#ffff",
                     borderTop: "1px solid #ccc",
+                    mt: 7,
                   }}
                 >
                   <span>
                     Selected Rows:{" "}
                     <strong>
-                      {globalSelectedRows.length === data.length
+                      {globalSelectedRows?.length === data?.length
                         ? "SelectedAll"
-                        : globalSelectedRows.length}
+                        : globalSelectedRows?.length}
                     </strong>
                   </span>
                   <span>
-                    Total Rows: <strong>{data.length}</strong>
+                    Total Rows: <strong>{data?.length}</strong>
                   </span>
                 </Box>
               </Box>

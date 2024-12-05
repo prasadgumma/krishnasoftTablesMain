@@ -37,20 +37,31 @@ const FilterDrawer = (props) => {
   };
 
   const handleChangeSearchType = (event) => {
-    setSearchType(event.target.value);
-    sendSearchType(event.target.value);
+    const Value = event.target.value;
+    setSearchType(Value);
+    sendSearchType(Value);
     setSearchText("");
   };
   const handleChangeDate = (event) => {
-    setCheckDate(event.target.value);
-    sendCheckedDate(event.target.value);
+    const Value = event.target.value;
+    setCheckDate(Value);
+    sendCheckedDate(Value);
   };
   const handleSearchChange = (event) => {
-    setSearchText(event.target.value);
-    console.log("Search Text:", event.target.value); // Optional: Handle search logic here
-    sendSearchText(event.target.value);
+    const Value = event.target.value;
+
+    if (searchType === "1") {
+      // Restrict to numbers only and limit to 10 digits for Phone Number
+      if (/^\d*$/.test(Value) && Value.length <= 10) {
+        console.log(Value, "SearchValue");
+        setSearchText(Value);
+        sendSearchText(Value);
+      }
+    } else {
+      // Allow any value for other search types
+      setSearchText(Value);
+    }
   };
-  console.log(searchType, "SearchT");
 
   return (
     <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
@@ -86,12 +97,12 @@ const FilterDrawer = (props) => {
 
           <Grid item xs={12}>
             <FormControl fullWidth>
-              <InputLabel id="status-select-label">Check Date:</InputLabel>
+              <InputLabel id="status-select-label">Check Date</InputLabel>
               <Select
                 labelId="status-select-label"
                 id="status-select"
                 value={checkDate}
-                label="Status"
+                label="Check Date"
                 onChange={handleChangeDate}
               >
                 <MenuItem value="1">Yes</MenuItem>
@@ -102,15 +113,15 @@ const FilterDrawer = (props) => {
 
           <Grid item xs={12}>
             <FormControl fullWidth>
-              <InputLabel id="status-select-label">Search Type:</InputLabel>
+              <InputLabel id="search-select-label">Search Type</InputLabel>
               <Select
-                labelId="status-select-label"
-                id="status-select"
+                labelId="search-select-label"
+                id="search-select"
                 value={searchType}
-                label="Status"
+                label="Search Type"
                 onChange={handleChangeSearchType}
               >
-                <MenuItem value="3">Select Type</MenuItem>
+                <MenuItem value="">Select Type</MenuItem>
                 <MenuItem value="1">Phone Number</MenuItem>
                 <MenuItem value="2">Trip ID</MenuItem>
               </Select>
@@ -123,10 +134,18 @@ const FilterDrawer = (props) => {
               fullWidth
               value={searchText}
               onChange={handleSearchChange}
-              placeholder="Type to search..."
-              disabled={
-                searchType === "3" // Read-only if Option 1 is selected
+              // placeholder="Type to search..."
+              placeholder={
+                searchType === "1"
+                  ? "Enter Phone Number (10 digits)"
+                  : searchType === "2"
+                  ? "Enter Trip ID"
+                  : "Select Search Type"
               }
+              disabled={searchType === ""}
+              inputProps={{
+                maxLength: searchType === "1" ? 10 : undefined, // Apply max length for Phone Number
+              }}
             />
           </Grid>
 

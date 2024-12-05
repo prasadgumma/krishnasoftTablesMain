@@ -14,6 +14,7 @@ import ViewMember from "../components/tables/view-member.js";
 import DummyTable from "../components/tables/dummy-table.js";
 import MainFilters from "../components/filters/main-filters.js";
 import SafeTripTable from "../components/safetriptable/safe-trip-table.js";
+import TripView from "../components/safetriptable/view-trip.js";
 
 
 const AppRoute = [
@@ -35,9 +36,9 @@ const AppRoute = [
           { path: 'my-filters', element: <MainFilters /> },
           { path: "add-member", element: <AddMember /> },
           { path: "edit/member/:id", element: <EditMember /> },
-          { path: "view/member/:id", element: <ViewMember /> },
+          { path: "view/member/:id", element: <ViewMember /> },  //tripId
           { path: "safe-trip", element: <SafeTripTable /> },
-
+          { path: "trip/view/:tripId", element: <TripView /> },
 
 
 
