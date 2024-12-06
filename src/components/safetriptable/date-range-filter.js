@@ -99,3 +99,74 @@ const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
 };
 
 export default DateRangeFilter;
+
+// import React, { useState } from "react";
+// import { Button, Row, Col, Form } from "react-bootstrap";
+// import DateRangePicker from "react-bootstrap-daterangepicker"; // Import the date range picker
+// import moment from "moment";
+// import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+// import "react-bootstrap-daterangepicker/daterangepicker.css"; // Import DateRangePicker CSS
+
+// const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
+//   const [selectedRange, setSelectedRange] = useState({
+//     startDate: dateFilter.fromDate
+//       ? moment(dateFilter.fromDate, "DD-MM-YYYY")
+//       : null,
+//     endDate: dateFilter.toDate ? moment(dateFilter.toDate, "DD-MM-YYYY") : null,
+//   });
+
+//   // Handle the date range selection
+//   const handleDateRangeChange = (start, end) => {
+//     const formattedFromDate = start.format("DD-MM-YYYY");
+//     const formattedToDate = end.format("DD-MM-YYYY");
+
+//     setSelectedRange({ startDate: start, endDate: end });
+//     setDateFilter({ fromDate: formattedFromDate, toDate: formattedToDate });
+//   };
+
+//   return (
+//     <div className="container">
+//       <Row className="mb-3">
+//         <Col>
+//           <Form.Label>Date Range</Form.Label>
+//           <DateRangePicker
+//             initialSettings={{
+//               startDate: selectedRange.startDate,
+//               endDate: selectedRange.endDate,
+//               locale: { format: "DD-MM-YYYY" }, // Format date to DD-MM-YYYY
+//               autoApply: true, // Automatically apply range when selected
+//             }}
+//             onApply={(event, picker) => {
+//               handleDateRangeChange(picker.startDate, picker.endDate);
+//             }}
+//           >
+//             <Button variant="outline-secondary" className="form-control">
+//               {selectedRange.startDate && selectedRange.endDate
+//                 ? `${selectedRange.startDate.format(
+//                     "DD-MM-YYYY"
+//                   )} - ${selectedRange.endDate.format("DD-MM-YYYY")}`
+//                 : "Select Date Range"}
+//             </Button>
+//           </DateRangePicker>
+//         </Col>
+//       </Row>
+
+//       <Row>
+//         <Col>
+//           {/* Optional Reset Button */}
+//           <Button
+//             variant="danger"
+//             onClick={() => {
+//               setSelectedRange({ startDate: null, endDate: null });
+//               setDateFilter({ fromDate: null, toDate: null });
+//             }}
+//           >
+//             Reset
+//           </Button>
+//         </Col>
+//       </Row>
+//     </div>
+//   );
+// };
+
+// export default DateRangeFilter;

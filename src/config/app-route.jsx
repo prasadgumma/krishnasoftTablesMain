@@ -38,7 +38,7 @@ const AppRoute = [
           { path: "edit/member/:id", element: <EditMember /> },
           { path: "view/member/:id", element: <ViewMember /> },  //tripId
           { path: "safe-trip", element: <SafeTripTable /> },
-          { path: "trip/view/:tripId", element: <TripView /> },
+          { path: "trip/view/:trip_gen_id", element: <TripView /> },
 
 
 

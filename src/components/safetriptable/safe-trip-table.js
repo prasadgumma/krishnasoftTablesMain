@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   Typography,
   Button,
@@ -9,18 +9,16 @@ import {
   Card,
   IconButton,
   Checkbox,
-  TextField,
   CircularProgress,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material"; // Import icons
 import { DataGrid } from "@mui/x-data-grid";
 import { v4 as uuidv4 } from "uuid";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import FilterDrawer from "./filter-drawer";
 import TableBottomActions from "./bottom-table-actions";
 import dayjs from "dayjs";
-import CustomDatePicker from "./custom-date-picker";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import TripDetailsDrawer from "./trip-details-drawer";
 
 const SafeTripTable = () => {
   const [data, setData] = useState([]);
@@ -29,6 +27,8 @@ const SafeTripTable = () => {
     page: 0,
     pageSize: 25,
   });
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedTripId, setSelectedTripId] = useState(null);
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -41,6 +41,11 @@ const SafeTripTable = () => {
     fromDate: "",
     toDate: "",
   });
+  const [dateRange, setDateRange] = useState({
+    startDate: null,
+    endDate: null,
+  });
+  const { trip_gen_id } = useParams();
 
   const sendStatus = (data) => {
     setStatus(data);
@@ -56,6 +61,10 @@ const SafeTripTable = () => {
     setSearchText(data);
   };
 
+  const sendDateRange = (data) => {
+    setDateRange(data);
+  };
+
   const columns = [
     {
       field: "id",
@@ -66,6 +75,18 @@ const SafeTripTable = () => {
       field: "trip_gen_id",
       headerName: "Trip Id",
       width: 150,
+      renderCell: (params) => (
+        <span
+          style={{
+            color: "blue",
+            textDecoration: "underline",
+            cursor: "pointer",
+          }}
+          onClick={() => handleTripIdClick(params.value)}
+        >
+          {params.value}
+        </span>
+      ),
     },
 
     {
@@ -177,7 +198,7 @@ const SafeTripTable = () => {
           </IconButton>
           <IconButton
             component={Link}
-            to={`/table/trip/view/${params.row.tripId}`} // View Member route
+            to={`/table/trip/view/${params.row.trip_gen_id}`} // View Member route
             color="success" // Use a different color to distinguish it
             sx={{ mr: 1 }}
           >
@@ -272,6 +293,15 @@ const SafeTripTable = () => {
     } catch (error) {
       console.error("Error fetching members:", error);
     }
+  };
+
+  const handleTripIdClick = (tripId) => {
+    setSelectedTripId(tripId);
+    setDrawerOpen(true);
+  };
+
+  const toggleDrawer1 = () => {
+    setDrawerOpen(!drawerOpen);
   };
 
   // Delete Functionality...
@@ -452,7 +482,7 @@ const SafeTripTable = () => {
                     <DataGrid
                       rows={data}
                       columns={columns}
-                      checkboxSelection
+                      checkboxSelection={true}
                       disableSelectionOnClick={false}
                       rowSelectionModel={globalSelectedRows}
                       onRowSelectionModelChange={handleSelectionChange}
@@ -465,6 +495,7 @@ const SafeTripTable = () => {
                           paginationModel: { page: 0, pageSize: 25 },
                         },
                       }}
+                      disableRowSelectionOnClick
                       pageSizeOptions={[5, 10, 25, { value: -1, label: "All" }]}
                       rowCount={data?.length} // Make sure this reflects the total number of members
                       onPaginationModelChange={handlePaginationChange}
@@ -613,6 +644,12 @@ const SafeTripTable = () => {
           dateFilter={dateFilter}
           setDateFilter={setDateFilter}
           sendSearchText={sendSearchText}
+          sendDateRange={sendDateRange}
+        />
+        <TripDetailsDrawer
+          open={drawerOpen}
+          onClose={toggleDrawer1}
+          tripId={selectedTripId}
         />
       </Box>
     </LocalizationProvider>

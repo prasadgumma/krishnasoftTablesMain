@@ -8,6 +8,8 @@ import SidebarRight from './components/sidebar-right/sidebar-right.jsx';
 import TopMenu from './components/top-menu/top-menu.jsx';
 import Content from './components/content/content.jsx';
 import ThemePanel from './components/theme-panel/theme-panel.jsx';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 function App() {
 	const [appTheme] = useState('');
