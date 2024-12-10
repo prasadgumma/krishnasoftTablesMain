@@ -13,7 +13,7 @@
 
 .react-datepicker__header {
   font-size: 2rem; /* Increase font size for header */
-  padding: 16px; /* Add padding */
+  padding: 10px; /* Add padding */
 }
 
 .react-datepicker__day {
@@ -33,4 +33,24 @@
 
 .react-datepicker__navigation {
   top: 15px; /* Adjust navigation buttons */
+}
+
+/* Styles for the start and end of the range */
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+  background-color: #5954ef; /* Green background for start and end dates */
+  color: white !important; /* White text */
+  border-radius: 50%; /* Make it circular */
+}
+
+/* Styles for the dates in between (range dates) */
+.react-datepicker__day--in-range {
+  background-color: #b6baf6 !important; /* Light green background for range dates */
+  color: rgb(255, 255, 255) !important; /* Black text */
+}
+
+/* Ensure hover effect works */
+.react-datepicker__day:hover {
+  background-color: #fefefe !important; /* Light gray on hover */
+  color: black !important;
 }

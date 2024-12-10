@@ -265,7 +265,7 @@ const SafeTripTable = () => {
         "http://192.168.21.71/devenv/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
         {
           lml: "894951d2ed1a413290f94a33b0dc12df",
-          dt: `${dateFilter[0]}\/${dateFilter[1]}`,
+          dt: `${dateFilter[1]}\/${dateFilter[0]}`,
           tripsts: status,
           chkdt: checkDate,
           srch: searchText,
