@@ -37,10 +37,7 @@ const SafeTripTable = () => {
   const [searchType, setSearchType] = useState("");
   const [searchText, setSearchText] = useState("");
   const [checkDate, setCheckDate] = useState("2");
-  const [dateFilter, setDateFilter] = useState({
-    fromDate: "",
-    toDate: "",
-  });
+  const [dateFilter, setDateFilter] = useState(["", ""]);
   const [dateRange, setDateRange] = useState({
     startDate: null,
     endDate: null,
@@ -149,13 +146,13 @@ const SafeTripTable = () => {
     {
       field: "stm",
       headerName: "Start Time",
-      width: 130,
+      width: 180,
     },
 
     {
       field: "etm",
       headerName: "End Time",
-      width: 130,
+      width: 180,
     },
     {
       field: "tripenddispnm",
@@ -208,6 +205,7 @@ const SafeTripTable = () => {
       ),
     },
   ];
+
   console.log(`${dateFilter.fromDate} / ${dateFilter.toDate}`);
 
   useEffect(() => {
@@ -223,17 +221,13 @@ const SafeTripTable = () => {
 
     // Get yesterday's date
     const yesterday = dayjs().subtract(1, "day").format("DD-MM-YYYY");
-    setDateFilter((prev) => ({
-      ...prev,
-      toDate: today,
-      fromDate: yesterday,
-    }));
+    setDateFilter([today, yesterday]);
     console.log(dateFilter, "DateFilter");
     // Log the dates to the console
     console.log("Today's Date:", today);
     console.log("Yesterday's Date:", yesterday);
     const fetchTripDetails = async () => {
-      console.log(`${dateFilter.fromDate} / ${dateFilter.toDate}`);
+      console.log(`${dateFilter[0]} / ${dateFilter[1]}`);
       try {
         const response = await axios.post(
           // "http://192.168.21.126/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
@@ -263,6 +257,7 @@ const SafeTripTable = () => {
   }, []);
 
   const applyHandler = async () => {
+    console.log(`${dateFilter[0]} ${dateFilter[1]}`);
     try {
       setLoading(true);
       const response = await axios.post(
@@ -270,14 +265,14 @@ const SafeTripTable = () => {
         "http://192.168.21.71/devenv/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
         {
           lml: "894951d2ed1a413290f94a33b0dc12df",
-          dt: `${dateFilter.fromDate}\/${dateFilter.toDate}`,
+          dt: `${dateFilter[0]}\/${dateFilter[1]}`,
           tripsts: status,
           chkdt: checkDate,
           srch: searchText,
           stype: searchType,
         }
       );
-
+      console.log(response, "responce");
       const overAllData = response?.data?.resp?.trips_list?.map(
         (trip, index) => {
           return { ...trip, id: index + 1 };

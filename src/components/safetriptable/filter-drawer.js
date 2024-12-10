@@ -30,15 +30,13 @@ const FilterDrawer = (props) => {
   const [searchType, setSearchType] = useState("");
   const [searchText, setSearchText] = useState("");
   const [checkDate, setCheckDate] = useState("2");
-  const [dateRange, setDateRange] = useState({
-    startDate: null,
-    endDate: null,
-  });
+  const [dateRange, setDateRange] = useState(["", ""]);
   // console.log(dateFilter, "dateFilter");
   const handleChangeStatus = (event) => {
     setStatus(event.target.value);
     sendStatus(event.target.value);
   };
+  console.log(dateFilter, "dateFilter");
 
   const handleChangeSearchType = (event) => {
     const Value = event.target.value;
