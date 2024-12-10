@@ -100,76 +100,6 @@
 
 // export default DateRangeFilter;
 
-//============================================================================================================
-
-// import React, { useEffect, useState } from "react";
-// import DatePicker from "react-datepicker";
-// import moment from "moment";
-// import "react-datepicker/dist/react-datepicker.css";
-// import { InputLabel, TextField } from "@mui/material";
-// import "./datePicker.css";
-// import { Card } from "react-bootstrap";
-
-// const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
-//   const [dates, setDates] = useState(["", ""]); // [startDate, endDate]
-
-//   useEffect(() => {
-//     // Initialize dateFilter with yesterday and today
-//     const today = new Date();
-//     const yesterday = new Date();
-//     yesterday.setDate(today.getDate() - 1);
-//     setDates([yesterday, today]);
-//   }, [setDates]);
-
-//   const handleDateChange = (dates) => {
-//     setDates(dates);
-//     console.log(dates);
-//     // Ensure both dates are formatted to DD-MM-YYYY when updating the state
-//     const formattedDates = [
-//       moment(dates[0]).format("DD-MM-YYYY"),
-//       moment(dates[1]).format("DD-MM-YYYY"),
-//     ];
-//     // setDateFilter(formattedDates); // Update state with formatted dates
-//   };
-
-//   console.log(dateFilter);
-
-//   return (
-//     <div
-//       style={{
-//         zIndex: 1000,
-//         justifyContent: "center",
-//         alignItems: "center",
-
-//         margin: "auto",
-//       }}
-//     >
-//       <Card>
-//         {/* Date range picker */}
-//         <DatePicker
-//           selected={dateFilter[0]} // start date
-//           onChange={handleDateChange} // handle both start and end date change
-//           startDate={dates[0]}
-//           endDate={dates[1]}
-//           selectsRange // enable range selection
-//           dateFormat="dd/MM/yyyy"
-//           placeholderText="Select Date Range"
-//           customInput={
-//             <TextField
-//               variant="outlined"
-//               fullWidth
-//               label="Date Range Picker"
-//               readOnly
-//             />
-//           }
-//         />
-//       </Card>
-//     </div>
-//   );
-// };
-
-// export default DateRangeFilter;
-
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import moment from "moment";
@@ -180,12 +110,12 @@ import "./datePicker.css";
 
 const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
   const [dates, setDates] = useState([null, null]); // [startDate, endDate]
-
+  console.log(dateFilter, "DateF");
   useEffect(() => {
     if (dateFilter && dateFilter[0] && dateFilter[1]) {
       // Format the dates properly when the component mounts
-      const startDate = moment(dateFilter[0], "DD/MM/YYYY").toDate();
-      const endDate = moment(dateFilter[1], "DD/MM/YYYY").toDate();
+      const startDate = moment(dateFilter[1], "DD/MM/YYYY").toDate();
+      const endDate = moment(dateFilter[0], "DD/MM/YYYY").toDate();
       setDates([startDate, endDate]);
     }
   }, [dateFilter]);
@@ -195,8 +125,8 @@ const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
     if (selectedDates[0] && selectedDates[1]) {
       // Format both dates to DD/MM/YYYY when updating the state
       const formattedDates = [
-        moment(selectedDates[0]).format("DD-MM-YYYY"),
         moment(selectedDates[1]).format("DD-MM-YYYY"),
+        moment(selectedDates[0]).format("DD-MM-YYYY"),
       ];
       setDateFilter(formattedDates); // Update parent state with formatted dates
     }
@@ -242,81 +172,3 @@ const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
 };
 
 export default DateRangeFilter;
-
-//=============================================================================================================
-
-// import React, { useEffect, useState } from "react";
-// import DatePicker from "react-datepicker";
-// import moment from "moment";
-// import "react-datepicker/dist/react-datepicker.css";
-// import { TextField } from "@mui/material";
-// import { Card } from "react-bootstrap";
-// import "./datePicker.css";
-
-// const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
-//   const [dates, setDates] = useState([null, null]); // [startDate, endDate]
-
-//   useEffect(() => {
-//     // Initialize dateFilter with yesterday and today
-//     setDates(dateFilter);
-//     // const today = new Date();
-//     // const yesterday = new Date();
-//     // yesterday.setDate(today.getDate() - 1);
-
-//     // setDates([yesterday, today]);
-//     // setDateFilter([
-//     //   moment(yesterday).format("DD-MM-YYYY"),
-//     //   moment(today).format("DD-MM-YYYY"),
-//     // ]);
-//   }, [dateFilter]);
-
-//   const handleDateChange = (selectedDates) => {
-//     setDates(selectedDates);
-//     if (selectedDates[0] && selectedDates[1]) {
-//       // Ensure both dates are formatted to DD-MM-YYYY when updating the state
-//       const formattedDates = [
-//         moment(selectedDates[0]).format("DD/MM/YYYY"),
-//         moment(selectedDates[1]).format("DD/MM/YYYY"),
-//       ];
-//       setDateFilter(formattedDates); // Update parent state with formatted dates
-//     }
-//   };
-//   console.log(dateFilter);
-//   const formattedDateRange =
-//     dates[0] && dates[1] ? `${dates[0]} / ${dates[1]}` : "";
-
-//   return (
-//     <div
-//       style={{
-//         zIndex: 1000,
-//         justifyContent: "center",
-//         alignItems: "center",
-//         margin: "auto",
-//       }}
-//     >
-//       <Card style={{ padding: "16px" }}>
-//         {/* Date range picker */}
-//         <DatePicker
-//           selected={dateFilter[0]} // Start date
-//           onChange={handleDateChange} // Handle both start and end date change
-//           startDate={dates[0]}
-//           endDate={dates[1]}
-//           selectsRange // Enable range selection
-//           format="DD-MM-YYYY"
-//           placeholderText="Select Date Range"
-//           value={formattedDateRange}
-//           customInput={
-//             <TextField
-//               variant="outlined"
-//               fullWidth
-//               label="Date Range Picker"
-//               readOnly
-//             />
-//           }
-//         />
-//       </Card>
-//     </div>
-//   );
-// };
-
-// export default DateRangeFilter;
