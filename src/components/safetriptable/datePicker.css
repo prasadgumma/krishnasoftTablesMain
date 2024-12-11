@@ -1,56 +1,42 @@
-.react-datepicker-popper {
-  z-index: 1000;
+/* Apply grid layout to the entire DateRangePicker */
+.dateRangePickerClass {
+  display: grid; /* Use grid layout */
+  grid-template-columns: repeat(
+    7,
+    1fr
+  ); /* Create 7 equal columns (for days of the week) */
+  grid-template-rows: repeat(6, 1fr); /* Create 6 equal rows for weeks */
+  width: 100%; /* Full width */
+  height: 200px; /* Set height to be uniform */
+  font-size: 12px; /* Set a smaller font size */
 }
 
-.react-datepicker {
-  font-size: 1.5rem; /* Increase font size */
+/* Apply grid properties to the day cells */
+dateRangePickerClass .rdrDay {
+  height: 40px; /* Make sure each cell fills its grid space */
+  width: 18%; /* Make sure each cell fills its grid space */
+  border-radius: 5px; /* Optional: rounded corners for day cells */
+  background-color: #f0f0f0; /* Light background color for day cells */
 }
 
-.react-datepicker__month-container {
-  width: 400px; /* Increase calendar width */
-  height: 350px; /* Increase calendar height */
+/* Apply padding for the quick range options (Today, Yesterday, etc.) */
+.dateRangePickerClass .rdrDefinedRangesItem {
+  display: inline-block;
+  padding: 10px 15px;
+  font-size: 12px; /* Smaller font size */
+  width: 100%; /* Equal width for range items */
+  text-align: center;
 }
 
-.react-datepicker__header {
-  font-size: 2rem; /* Increase font size for header */
-  padding: 10px; /* Add padding */
+/* Apply padding for the defined ranges wrapper */
+.dateRangePickerClass .rdrDefinedRangesWrapper {
+  display: grid;
+  width: 150px;
+  /* Equal columns for each range option */
+  gap: 10px; /* Space between the range options */
 }
 
-.react-datepicker__day {
-  width: 50px; /* Increase width of each day cell */
-  height: 40px; /* Increase height of each day cell */
-}
-
-.react-datepicker__day-name {
-  width: 50px;
-  height: 50px;
-}
-
-.react-datepicker__current-month {
-  font-size: 1.4rem; /* Larger current month text */
-  color: green;
-}
-
-.react-datepicker__navigation {
-  top: 15px; /* Adjust navigation buttons */
-}
-
-/* Styles for the start and end of the range */
-.react-datepicker__day--range-start,
-.react-datepicker__day--range-end {
-  background-color: #5954ef; /* Green background for start and end dates */
-  color: white !important; /* White text */
-  border-radius: 50%; /* Make it circular */
-}
-
-/* Styles for the dates in between (range dates) */
-.react-datepicker__day--in-range {
-  background-color: #b6baf6 !important; /* Light green background for range dates */
-  color: rgb(255, 255, 255) !important; /* Black text */
-}
-
-/* Ensure hover effect works */
-.react-datepicker__day:hover {
-  background-color: #fefefe !important; /* Light gray on hover */
-  color: black !important;
+/* Adjust styles for the date display area */
+.dateRangePickerClass .rdrDateDisplayWrapper {
+  display: none;
 }

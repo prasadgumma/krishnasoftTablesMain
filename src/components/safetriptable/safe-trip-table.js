@@ -19,6 +19,8 @@ import FilterDrawer from "./filter-drawer";
 import TableBottomActions from "./bottom-table-actions";
 import dayjs from "dayjs";
 import TripDetailsDrawer from "./trip-details-drawer";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import TextField from "@mui/material/TextField";
 
 const SafeTripTable = () => {
   const [data, setData] = useState([]);
@@ -27,6 +29,7 @@ const SafeTripTable = () => {
     page: 0,
     pageSize: 25,
   });
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [globalSelectedRows, setGlobalSelectedRows] = useState([]);
@@ -121,26 +124,78 @@ const SafeTripTable = () => {
       headerName: "Trip Type",
       width: 150,
     },
+    // {
+    //   field: "livsts",
+    //   headerName: "Trip Status",
+    //   width: 150,
+
+    //   renderCell: (params) => (
+    //     <Typography
+    //       sx={{
+    //         textAlign: "center",
+    //         width: 80,
+    //         backgroundColor: params.row.livsts === 1 ? "#4caf50" : "#f44336", // Green for enabled, red for disabled
+    //         color: "white",
+    //         padding: "2px 6px",
+    //         borderRadius: "4px",
+    //         display: "inline-block", // Ensures the background fits the text
+    //       }}
+    //     >
+    //       {params.row.livsts === 1 ? "Started" : "End"}
+    //     </Typography>
+    //   ),
+    // },
+
     {
       field: "livsts",
       headerName: "Trip Status",
-      width: 100,
-
       renderCell: (params) => (
         <Typography
           sx={{
             textAlign: "center",
             width: 80,
-            backgroundColor: params.row.livsts === 1 ? "#4caf50" : "#f44336", // Green for enabled, red for disabled
+            backgroundColor:
+              params.row.livsts === 1
+                ? "#4caf50"
+                : params.row.livsts === 2
+                ? "#f44336"
+                : "#e0e0e0", // Green for "Started", Red for "End", Grey for undefined
             color: "white",
             padding: "2px 6px",
             borderRadius: "4px",
             display: "inline-block", // Ensures the background fits the text
           }}
         >
-          {params.row.livsts === 1 ? "Started" : "End"}
+          {params.row.livsts === 1
+            ? "Started"
+            : params.row.livsts === 2
+            ? "End"
+            : "Unknown"}
         </Typography>
       ),
+      renderEditCell: (params) => {
+        return (
+          <select
+            value={params.value}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Assuming a method to update the row's livsts field based on selection
+              params.api.getEditingCell().setValue(value);
+            }}
+          >
+            <option value={-1}>Any</option>
+            <option value={1}>Started</option>
+            <option value={2}>End</option>
+          </select>
+        );
+      },
+      type: "singleSelect",
+      valueOptions: [
+        { value: 1, label: "Started" },
+        { value: 2, label: "End" },
+      ],
+      width: 150,
+      editable: true,
     },
 
     {
@@ -148,6 +203,34 @@ const SafeTripTable = () => {
       headerName: "Start Time",
       width: 180,
     },
+
+    // {
+    //   field: "stm",
+    //   headerName: "Date",
+    //   width: 150,
+    //   filterOperators: [
+    //     {
+    //       label: "Filter by Date",
+    //       value: "date",
+    //       getApplyFilterFn: (filterItem) => {
+    //         console.log(filterItem, "filterItem");
+    //         if (!filterItem.value) {
+    //           return null;
+    //         }
+
+    //         return ({ rows }) => console.log(rows, "row");
+    //       },
+    //       InputComponent: ({ item, applyValue }) => (
+    //         <input
+    //           type="date"
+    //           value={item.value || ""}
+    //           onChange={(e) => applyValue({ ...item, value: e.target.value })}
+    //           style={{ width: "100%" }}
+    //         />
+    //       ),
+    //     },
+    //   ],
+    // },
 
     {
       field: "etm",
@@ -206,8 +289,6 @@ const SafeTripTable = () => {
     },
   ];
 
-  console.log(`${dateFilter.fromDate} / ${dateFilter.toDate}`);
-
   useEffect(() => {
     // Simulate data fetching
     setTimeout(() => {
@@ -265,7 +346,7 @@ const SafeTripTable = () => {
         "http://192.168.21.71/devenv/safe_travel_portal_ajax_apis/public/index.php/v1/trips_report",
         {
           lml: "894951d2ed1a413290f94a33b0dc12df",
-          dt: `${dateFilter[1]}\/${dateFilter[0]}`,
+          dt: `${dateFilter[0]}\/${dateFilter[1]}`,
           tripsts: status,
           chkdt: checkDate,
           srch: searchText,

@@ -36,7 +36,6 @@ const FilterDrawer = (props) => {
     setStatus(event.target.value);
     sendStatus(event.target.value);
   };
-  console.log(dateFilter, "dateFilter");
 
   const handleChangeSearchType = (event) => {
     const Value = event.target.value;
@@ -67,7 +66,7 @@ const FilterDrawer = (props) => {
 
   return (
     <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
-      <Box p={2} width="500px">
+      <Box p={2} width="600px">
         <Typography variant="h6" color="textPrimary" mb={2}>
           My Filters
         </Typography>
