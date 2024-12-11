@@ -186,8 +186,6 @@ import "react-date-range/dist/theme/default.css"; // Default theme
 import "./datePicker.css";
 import moment from "moment";
 import { Box, Button, TextField } from "@mui/material";
-// import "./datePicker.css";
-// import "./App.css";
 
 const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -212,7 +210,6 @@ const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
     ];
     setDateFilter(formattedDates);
     setShowCalendar(false);
-
     setCount(0); // Reset count to 0 after closing the calendar
   };
 

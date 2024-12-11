@@ -61,6 +61,7 @@ const FilterDrawer = (props) => {
     } else {
       // Allow any value for other search types
       setSearchText(Value);
+      sendSearchText(Value);
     }
   };
 
