@@ -67,7 +67,7 @@ const FilterDrawer = (props) => {
 
   return (
     <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
-      <Box p={2} width="600px">
+      <Box p={2} width="580px">
         <Typography variant="h6" color="textPrimary" mb={2}>
           My Filters
         </Typography>

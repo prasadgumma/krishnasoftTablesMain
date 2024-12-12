@@ -340,6 +340,9 @@ const SafeTripTable = () => {
   const applyHandler = async () => {
     console.log(`${dateFilter[0]} ${dateFilter[1]}`);
     console.log(searchText, searchType, "searchType");
+    if (searchType !== 1 || searchType !== 2) {
+      setSearchText("");
+    }
     try {
       setLoading(true);
       const response = await axios.post(

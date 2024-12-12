@@ -190,8 +190,8 @@ import { Box, Button, TextField } from "@mui/material";
 const DateRangeFilter = ({ dateFilter, setDateFilter }) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectionRange, setSelectionRange] = useState({
-    startDate: new Date(),
-    endDate: addDays(new Date(), 1), // Example: 1 day range
+    startDate: addDays(new Date(), -1),
+    endDate: new Date(), // Example: 1 day range
     key: "selection",
   });
   console.log(selectionRange, "selectionRange");
